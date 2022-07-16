@@ -199,11 +199,11 @@ impl CPU {
 
     fn ld(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        let value = self.mem_read(addr);
+        let val = self.mem_read(addr);
 
-        self.set_register(reg, value);
-        self.update_zero_flag(value);
-        self.update_negative_flag(value);
+        self.set_register(reg, val);
+        self.update_zero_flag(val);
+        self.update_negative_flag(val);
     }
 
     fn st(&mut self, reg: &Register, mode: &AddressingMode) {
@@ -212,7 +212,8 @@ impl CPU {
     }
 
     fn t(&mut self, from: &Register, to: &Register) {
-        self.set_register(to, self.get_register(from));
+        let val = self.get_register(from);
+        self.set_register(to, val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
