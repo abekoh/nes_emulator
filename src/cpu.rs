@@ -128,6 +128,7 @@ impl CPU {
                 Mnemonic::STA => self.st(&Register::A, &opcode.mode),
                 Mnemonic::STX => self.st(&Register::X, &opcode.mode),
                 Mnemonic::STY => self.st(&Register::Y, &opcode.mode),
+                Mnemonic::TAX => self.copy(&Register::A, &Register::X),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -207,6 +208,10 @@ impl CPU {
     fn st(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         self.mem_write(addr, self.get_register(reg));
+    }
+
+    fn copy(&mut self, from: &Register, to: &Register) {
+        self.set_register(to, self.get_register(from));
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -616,5 +621,15 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.mem_read(0x1122), 0x55);
         }
+    }
+
+    #[test]
+    fn tax() {
+        let mut cpu = CPU::new();
+        cpu.load(vec![0xaa, 0x00]);
+        cpu.reset();
+        cpu.a = 0x55;
+        cpu.run();
+        assert_eq!(cpu.x, 0x55);
     }
 }
