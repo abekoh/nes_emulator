@@ -208,6 +208,14 @@ mod tests {
             cpu.load_and_run(vec![0xa9, 0x00, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b10);
         }
+
+        #[test]
+        fn zero_off() {
+            let mut cpu = CPU::new();
+            // LDA #$00
+            cpu.load_and_run(vec![0xa9, 0x01, 0x00]);
+            assert_eq!(cpu.status & 0b0000_0010, 0b00);
+        }
     }
 
     #[cfg(test)]
