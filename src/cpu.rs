@@ -386,6 +386,25 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.x, 0x55);
         }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x55);
+            cpu.load_and_run(vec![0xae, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.x, 0x55);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x55);
+            cpu.load(vec![0xbe, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.y = 0x11;
+            cpu.run();
+            assert_eq!(cpu.x, 0x55);
+        }
     }
 
     #[cfg(test)]
