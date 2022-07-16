@@ -131,7 +131,7 @@ impl CPU {
 
                 let ptr: u8 = (base as u8).wrapping_add(self.x);
                 let lo = self.mem_read(ptr as u16);
-                let hi = self.mem_read((base as u8).wrapping_add(1) as u16);
+                let hi = self.mem_read(ptr.wrapping_add(1) as u16);
                 (hi as u16) << 8 | (lo as u16)
             }
             AddressingMode::Indirect_Y => {
@@ -250,6 +250,19 @@ mod tests {
             cpu.y = 0x11;
             cpu.run();
             assert_eq!(cpu.a, 0x55);
+        }
+
+        #[test]
+        fn indirect_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0705, 0x0a);
+            cpu.mem_write(0x01, 0x05);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load(vec![0xa1, 0x00, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.a, 0x0a);
         }
     }
 
