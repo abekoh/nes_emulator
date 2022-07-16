@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops::Add;
 
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
@@ -140,6 +141,7 @@ impl CPU {
                 Mnemonic::TXA => self.t(&Register::X, &Register::A),
                 Mnemonic::TXS => self.t(&Register::X, &Register::S),
                 Mnemonic::TYA => self.t(&Register::Y, &Register::A),
+                Mnemonic::ADC => self.adc(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -227,6 +229,16 @@ impl CPU {
         self.set_register(to, val);
         self.update_zero_flag(val);
         self.update_negative_flag(val);
+    }
+
+    fn adc(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let (res, _) = self.a.overflowing_add(mem_val); // TODO: with overflow flag
+        self.a = res;
+        self.update_zero_flag(res);
+        self.update_negative_flag(res);
+        // TODO: update V,C
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -673,5 +685,19 @@ mod tests {
         cpu.y = 0x55;
         cpu.run();
         assert_eq!(cpu.a, 0x55);
+    }
+
+    #[cfg(test)]
+    mod adc {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x69, 0x11, 0x00]);
+            cpu.a = 0x22;
+            cpu.run();
+            assert_eq!(cpu.a, 0x33);
+        }
     }
 }
