@@ -340,6 +340,26 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.status & 0b0000_0001, 0b0000_0000);
         }
+
+        #[test]
+        fn overflow_on() {
+            let mut cpu = CPU::new();
+            // ADC #$ff
+            cpu.load_reset(vec![0x69, 0b0100_0000, 0x00]);
+            cpu.a = 0b0100_0000;
+            cpu.run();
+            assert_eq!(cpu.status & 0b0100_0000, 0b0100_0000);
+        }
+
+        #[test]
+        fn overflow_off() {
+            let mut cpu = CPU::new();
+            // ADC #$01
+            cpu.load_reset(vec![0x69, 0x01, 0x00]);
+            cpu.a = 0x01;
+            cpu.run();
+            assert_eq!(cpu.status & 0b0100_0000, 0b0000_0000);
+        }
     }
 
     #[cfg(test)]
