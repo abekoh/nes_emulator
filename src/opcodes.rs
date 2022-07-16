@@ -24,6 +24,7 @@ impl OpCode {
             AddressingMode::ZeroPage_X => 1,
             AddressingMode::Absolute => 2,
             AddressingMode::Absolute_X => 2,
+            AddressingMode::Absolute_Y => 2,
             AddressingMode::Indirect_X => 1,
             AddressingMode::Indirect_Y => 1,
             _ => todo!()

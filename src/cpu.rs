@@ -99,7 +99,6 @@ impl CPU {
                     self.ldy(&opcode.mode);
                 }
                 Mnemonic::BRK => return,
-                _ => todo!()
             }
             self.pc += opcode.pc_offset() as u16;
         }
@@ -238,6 +237,17 @@ mod tests {
             cpu.load(vec![0xbd, 0x22, 0x11, 0x00]);
             cpu.reset();
             cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.a, 0x55);
+        }
+
+        #[test]
+        fn absolute_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x55);
+            cpu.load(vec![0xb9, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.y = 0x11;
             cpu.run();
             assert_eq!(cpu.a, 0x55);
         }
