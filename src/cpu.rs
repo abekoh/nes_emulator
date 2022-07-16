@@ -253,11 +253,11 @@ impl CPU {
         let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
         let (res, over1) = self.a.overflowing_add(mem_val);
         let (res, over2) = res.overflowing_add(carry_val);
+        self.set_flag(&Flag::Carry, over1 || over2);
+        self.set_flag(&Flag::OverFlow, (res ^ mem_val) & (res ^ self.a) & 0b1000_0000 != 0);
         self.a = res;
         self.update_zero_flag(res);
         self.update_negative_flag(res);
-        self.set_flag(&Flag::Carry, over1 || over2);
-        // TODO: update V
     }
 
     fn update_zero_flag(&mut self, result: u8) {
