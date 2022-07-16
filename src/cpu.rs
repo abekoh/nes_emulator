@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::num::Wrapping;
 use std::ops::Add;
+use crate::cpu::IntType::Positive;
 
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
@@ -241,7 +242,8 @@ impl CPU {
         self.a = res;
         self.update_zero_flag(res);
         self.update_negative_flag(res);
-        // TODO: update V,C
+        self.set_flag(&Flag::Carry, over1 || over2);
+        // TODO: update V
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -303,6 +305,26 @@ mod tests {
             // LDA #$01
             cpu.load_reset_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b1000_0000, 0b0000_0000);
+        }
+
+        #[test]
+        fn carry_on() {
+            let mut cpu = CPU::new();
+            // ADC #$ff
+            cpu.load_reset(vec![0x69, 0xff, 0x00]);
+            cpu.a = 0x01;
+            cpu.run();
+            assert_eq!(cpu.status & 0b0000_0001, 0b0000_0001);
+        }
+
+        #[test]
+        fn carry_off() {
+            let mut cpu = CPU::new();
+            // ADC #$01
+            cpu.load_reset(vec![0x69, 0x01, 0x00]);
+            cpu.a = 0x01;
+            cpu.run();
+            assert_eq!(cpu.status & 0b0000_0001, 0b0000_0000);
         }
     }
 
