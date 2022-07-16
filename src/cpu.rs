@@ -125,7 +125,7 @@ impl CPU {
                 Mnemonic::LDA => self.ld(&Register::A, &opcode.mode),
                 Mnemonic::LDX => self.ld(&Register::X, &opcode.mode),
                 Mnemonic::LDY => self.ld(&Register::Y, &opcode.mode),
-                Mnemonic::STA => self.sta(&opcode.mode),
+                Mnemonic::STA => self.st(&Register::A, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -202,9 +202,9 @@ impl CPU {
         self.update_negative_flag(value);
     }
 
-    fn sta(&mut self, mode: &AddressingMode) {
+    fn st(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        self.mem_write(addr, self.a);
+        self.mem_write(addr, self.get_register(reg));
     }
 
     fn update_zero_flag(&mut self, result: u8) {
