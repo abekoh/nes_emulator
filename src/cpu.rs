@@ -40,6 +40,12 @@ enum Flag {
     Negative,
 }
 
+enum Register {
+    A,
+    X,
+    Y,
+}
+
 impl Flag {
     fn place(&self) -> u8 {
         match self {
@@ -116,9 +122,9 @@ impl CPU {
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
             match &(opcode.mnemonic) {
-                Mnemonic::LDA => self.lda(&opcode.mode),
-                Mnemonic::LDX => self.ldx(&opcode.mode),
-                Mnemonic::LDY => self.ldy(&opcode.mode),
+                Mnemonic::LDA => self.ld(&Register::A, &opcode.mode),
+                Mnemonic::LDX => self.ld(&Register::X, &opcode.mode),
+                Mnemonic::LDY => self.ld(&Register::Y, &opcode.mode),
                 Mnemonic::STA => self.sta(&opcode.mode),
                 Mnemonic::BRK => return,
             }
@@ -171,31 +177,29 @@ impl CPU {
         }
     }
 
-    fn lda(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let value = self.mem_read(addr);
-
-        self.a = value;
-        self.update_zero_flag(self.a);
-        self.update_negative_flag(self.a);
+    fn get_register(&self, reg: &Register) -> u8 {
+        match reg {
+            Register::A => self.a,
+            Register::X => self.x,
+            Register::Y => self.y,
+        }
     }
 
-    fn ldx(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let value = self.mem_read(addr);
-
-        self.x = value;
-        self.update_zero_flag(self.x);
-        self.update_negative_flag(self.x);
+    fn set_register(&mut self, reg: &Register, data: u8) {
+        match reg {
+            Register::A => self.a = data,
+            Register::X => self.x = data,
+            Register::Y => self.y = data,
+        };
     }
 
-    fn ldy(&mut self, mode: &AddressingMode) {
+    fn ld(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem_read(addr);
 
-        self.y = value;
-        self.update_zero_flag(self.y);
-        self.update_negative_flag(self.y);
+        self.set_register(reg, value);
+        self.update_zero_flag(value);
+        self.update_negative_flag(value);
     }
 
     fn sta(&mut self, mode: &AddressingMode) {
