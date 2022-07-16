@@ -166,14 +166,19 @@ impl CPU {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
-    #[test]
-    fn lda() {
-        let mut cpu = CPU::new();
-        cpu.mem_write(0x10, 0x55);
-        cpu.load_and_run(vec![0xa5, 0x10, 0x00]);
-        assert_eq!(cpu.a, 0x55);
+    #[cfg(test)]
+    mod lda {
+        use super::*;
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x55);
+            cpu.load_and_run(vec![0xa5, 0x10, 0x00]);
+            assert_eq!(cpu.a, 0x55);
+        }
     }
 }
