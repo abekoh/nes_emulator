@@ -249,6 +249,10 @@ impl CPU {
         self.set_flag(&Flag::Negative, result & 0b1000_0000 != 0);
     }
 
+    fn get_flag(&mut self, flag: &Flag) -> bool {
+        (self.status & flag.place()) > 0
+    }
+
     fn set_flag(&mut self, flag: &Flag, val: bool) {
         if val {
             self.status = self.status | flag.place();
