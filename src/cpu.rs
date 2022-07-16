@@ -235,7 +235,9 @@ impl CPU {
     fn adc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
-        let (res, _) = self.a.overflowing_add(mem_val); // TODO: with overflow flag
+        let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
+        let (res, over1) = self.a.overflowing_add(mem_val);
+        let (res, over2) = res.overflowing_add(carry_val);
         self.a = res;
         self.update_zero_flag(res);
         self.update_negative_flag(res);
@@ -250,7 +252,7 @@ impl CPU {
         self.set_flag(&Flag::Negative, result & 0b1000_0000 != 0);
     }
 
-    fn get_flag(&mut self, flag: &Flag) -> bool {
+    fn get_flag(&self, flag: &Flag) -> bool {
         (self.status & flag.place()) > 0
     }
 
