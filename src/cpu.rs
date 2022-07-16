@@ -213,6 +213,8 @@ impl CPU {
     fn t(&mut self, from: &Register, to: &Register) {
         let val = self.get_register(from);
         self.set_register(to, val);
+        self.update_zero_flag(val);
+        self.update_negative_flag(val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
