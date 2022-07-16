@@ -7,7 +7,7 @@ pub struct CPU {
     pub a: u8,
     pub x: u8,
     pub y: u8,
-    // pub stack_pointer: u8,
+    pub sp: u8,
     pub status: u8,
     pub pc: u16,
     mem: [u8; 0xFFFF],
@@ -44,6 +44,7 @@ enum Register {
     A,
     X,
     Y,
+    S,
 }
 
 impl Flag {
@@ -67,6 +68,7 @@ impl CPU {
             a: 0,
             x: 0,
             y: 0,
+            sp: 0,
             status: 0,
             pc: 0,
             mem: [0; 0xFFFF],
@@ -186,6 +188,7 @@ impl CPU {
             Register::A => self.a,
             Register::X => self.x,
             Register::Y => self.y,
+            Register::S => self.sp,
         }
     }
 
@@ -194,6 +197,7 @@ impl CPU {
             Register::A => self.a = data,
             Register::X => self.x = data,
             Register::Y => self.y = data,
+            Register::S => self.sp = data,
         };
     }
 
