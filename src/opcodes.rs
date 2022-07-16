@@ -52,7 +52,7 @@ lazy_static! {
         OpCode::new(0xbd, Mnemonic::LDA, AddressingMode::Absolute_X),
         OpCode::new(0xb9, Mnemonic::LDA, AddressingMode::Absolute_Y),
         OpCode::new(0xa1, Mnemonic::LDA, AddressingMode::Indirect_X),
-        OpCode::new(0xb1, Mnemonic::LDA, AddressingMode::Indirect_X),
+        OpCode::new(0xb1, Mnemonic::LDA, AddressingMode::Indirect_Y),
 
         // LDX
         OpCode::new(0xa2, Mnemonic::LDX, AddressingMode::Immediate),

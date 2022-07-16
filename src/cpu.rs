@@ -264,6 +264,19 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.a, 0x0a);
         }
+
+        #[test]
+        fn indirect_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0704, 0x0a);
+            cpu.mem_write(0x01, 0x03);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load(vec![0xb1, 0x01, 0x00]);
+            cpu.reset();
+            cpu.y = 0x01;
+            cpu.run();
+            assert_eq!(cpu.a, 0x0a);
+        }
     }
 
     #[cfg(test)]
