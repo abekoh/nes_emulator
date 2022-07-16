@@ -41,6 +41,7 @@ pub enum Mnemonic {
     STX,
     STY,
     TAX,
+    TAY,
 }
 
 lazy_static! {
@@ -93,6 +94,9 @@ lazy_static! {
 
         // TAX
         OpCode::new(0xaa, Mnemonic::TAX, AddressingMode::NoneAddressing),
+
+        // TAY
+        OpCode::new(0xa8, Mnemonic::TAY, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

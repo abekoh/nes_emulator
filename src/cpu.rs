@@ -128,7 +128,8 @@ impl CPU {
                 Mnemonic::STA => self.st(&Register::A, &opcode.mode),
                 Mnemonic::STX => self.st(&Register::X, &opcode.mode),
                 Mnemonic::STY => self.st(&Register::Y, &opcode.mode),
-                Mnemonic::TAX => self.copy(&Register::A, &Register::X),
+                Mnemonic::TAX => self.t(&Register::A, &Register::X),
+                Mnemonic::TAY => self.t(&Register::A, &Register::Y),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -210,7 +211,7 @@ impl CPU {
         self.mem_write(addr, self.get_register(reg));
     }
 
-    fn copy(&mut self, from: &Register, to: &Register) {
+    fn t(&mut self, from: &Register, to: &Register) {
         self.set_register(to, self.get_register(from));
     }
 
@@ -631,5 +632,15 @@ mod tests {
         cpu.a = 0x55;
         cpu.run();
         assert_eq!(cpu.x, 0x55);
+    }
+
+    #[test]
+    fn tay() {
+        let mut cpu = CPU::new();
+        cpu.load(vec![0xa8, 0x00]);
+        cpu.reset();
+        cpu.a = 0x55;
+        cpu.run();
+        assert_eq!(cpu.y, 0x55);
     }
 }
