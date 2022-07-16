@@ -191,8 +191,8 @@ impl CPU {
         let value = self.mem_read(addr);
 
         self.x = value;
-        self.update_zero_flag(self.a);
-        self.update_negative_flag(self.a);
+        self.update_zero_flag(self.x);
+        self.update_negative_flag(self.x);
     }
 
     fn ldy(&mut self, mode: &AddressingMode) {
@@ -200,8 +200,8 @@ impl CPU {
         let value = self.mem_read(addr);
 
         self.y = value;
-        self.update_zero_flag(self.a);
-        self.update_negative_flag(self.a);
+        self.update_zero_flag(self.y);
+        self.update_negative_flag(self.y);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
