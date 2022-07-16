@@ -91,6 +91,9 @@ impl CPU {
                 0xa9 | 0xa5 | 0xb5 => {
                     self.lda(&opcode.mode);
                 }
+                0xa2 => {
+                    self.ldx(&opcode.mode);
+                }
                 0x00 => return,
                 _ => todo!()
             }
@@ -151,6 +154,14 @@ impl CPU {
         self.update_zero_and_negative_flags(self.a);
     }
 
+    fn ldx(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem_read(addr);
+
+        self.x = value;
+        self.update_zero_and_negative_flags(self.x);
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status = self.status | 0b0000_0010;
@@ -197,6 +208,18 @@ mod tests {
             cpu.mem_write(0x11, 0x55);
             cpu.load_and_run(vec![0xb5, 0x10, 0x00]);
             assert_eq!(cpu.a, 0x55);
+        }
+    }
+
+    #[cfg(test)]
+    mod ldx {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_and_run(vec![0xa2, 0x11, 0x00]);
+            assert_eq!(cpu.x, 0x11);
         }
     }
 }
