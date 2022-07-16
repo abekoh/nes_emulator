@@ -104,7 +104,7 @@ impl CPU {
         self.pc = self.mem_read_u16(0xFFFC);
     }
 
-    pub fn load_and_run(&mut self, program: Vec<u8>) {
+    pub fn load_reset_run(&mut self, program: Vec<u8>) {
         self.load(program);
         self.reset();
         self.run();
@@ -262,7 +262,7 @@ mod tests {
         fn zero_on() {
             let mut cpu = CPU::new();
             // LDA #$00
-            cpu.load_and_run(vec![0xa9, 0x00, 0x00]);
+            cpu.load_reset_run(vec![0xa9, 0x00, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b10);
         }
 
@@ -270,7 +270,7 @@ mod tests {
         fn zero_off() {
             let mut cpu = CPU::new();
             // LDA #$01
-            cpu.load_and_run(vec![0xa9, 0x01, 0x00]);
+            cpu.load_reset_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b00);
         }
 
@@ -278,7 +278,7 @@ mod tests {
         fn negative_on() {
             let mut cpu = CPU::new();
             // LDA #$ff
-            cpu.load_and_run(vec![0xa9, 0xff, 0x00]);
+            cpu.load_reset_run(vec![0xa9, 0xff, 0x00]);
             assert_eq!(cpu.status & 0b1000_0000, 0b1000_0000);
         }
 
@@ -286,7 +286,7 @@ mod tests {
         fn negative_off() {
             let mut cpu = CPU::new();
             // LDA #$01
-            cpu.load_and_run(vec![0xa9, 0x01, 0x00]);
+            cpu.load_reset_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b1000_0000, 0b0000_0000);
         }
     }
@@ -298,7 +298,7 @@ mod tests {
         #[test]
         fn immediate() {
             let mut cpu = CPU::new();
-            cpu.load_and_run(vec![0xa9, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xa9, 0x11, 0x00]);
             assert_eq!(cpu.a, 0x11);
         }
 
@@ -306,7 +306,7 @@ mod tests {
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x55);
-            cpu.load_and_run(vec![0xa5, 0x10, 0x00]);
+            cpu.load_reset_run(vec![0xa5, 0x10, 0x00]);
             assert_eq!(cpu.a, 0x55);
         }
 
@@ -325,7 +325,7 @@ mod tests {
         fn absolute() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1122, 0x55);
-            cpu.load_and_run(vec![0xad, 0x22, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xad, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.a, 0x55);
         }
 
@@ -385,7 +385,7 @@ mod tests {
         #[test]
         fn immediate() {
             let mut cpu = CPU::new();
-            cpu.load_and_run(vec![0xa2, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xa2, 0x11, 0x00]);
             assert_eq!(cpu.x, 0x11);
         }
 
@@ -393,7 +393,7 @@ mod tests {
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x55);
-            cpu.load_and_run(vec![0xa6, 0x10, 0x00]);
+            cpu.load_reset_run(vec![0xa6, 0x10, 0x00]);
             assert_eq!(cpu.x, 0x55);
         }
 
@@ -412,7 +412,7 @@ mod tests {
         fn absolute() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1122, 0x55);
-            cpu.load_and_run(vec![0xae, 0x22, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xae, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.x, 0x55);
         }
 
@@ -435,7 +435,7 @@ mod tests {
         #[test]
         fn immediate() {
             let mut cpu = CPU::new();
-            cpu.load_and_run(vec![0xa0, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xa0, 0x11, 0x00]);
             assert_eq!(cpu.y, 0x11);
         }
 
@@ -443,7 +443,7 @@ mod tests {
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x55);
-            cpu.load_and_run(vec![0xa4, 0x10, 0x00]);
+            cpu.load_reset_run(vec![0xa4, 0x10, 0x00]);
             assert_eq!(cpu.y, 0x55);
         }
 
@@ -462,7 +462,7 @@ mod tests {
         fn absolute() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1122, 0x55);
-            cpu.load_and_run(vec![0xac, 0x22, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0xac, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.y, 0x55);
         }
 
