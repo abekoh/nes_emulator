@@ -484,5 +484,37 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.mem_read(0x02), 0x55);
         }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x8d, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0x55;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1122), 0x55);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x9d, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0x55;
+            cpu.x = 0x33;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1155), 0x55);
+        }
+
+        #[test]
+        fn absolute_y() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x99, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0x55;
+            cpu.y = 0x33;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1155), 0x55);
+        }
     }
 }
