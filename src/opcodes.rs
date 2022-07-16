@@ -64,6 +64,10 @@ lazy_static! {
 
         // LDY
         OpCode::new(0xa0, Mnemonic::LDY, AddressingMode::Immediate),
+        OpCode::new(0xa4, Mnemonic::LDY, AddressingMode::ZeroPage),
+        OpCode::new(0xb4, Mnemonic::LDY, AddressingMode::ZeroPage_X),
+        OpCode::new(0xac, Mnemonic::LDY, AddressingMode::Absolute),
+        OpCode::new(0xbc, Mnemonic::LDY, AddressingMode::Absolute_X),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

@@ -377,7 +377,7 @@ mod tests {
         }
 
         #[test]
-        fn zeropage_x() {
+        fn zeropage_y() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0x55);
             cpu.load(vec![0xb6, 0x10, 0x00]);
@@ -396,7 +396,7 @@ mod tests {
         }
 
         #[test]
-        fn absolute_x() {
+        fn absolute_y() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0x55);
             cpu.load(vec![0xbe, 0x22, 0x11, 0x00]);
@@ -416,6 +416,44 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.load_and_run(vec![0xa0, 0x11, 0x00]);
             assert_eq!(cpu.y, 0x11);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x55);
+            cpu.load_and_run(vec![0xa4, 0x10, 0x00]);
+            assert_eq!(cpu.y, 0x55);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0x55);
+            cpu.load(vec![0xb4, 0x10, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.y, 0x55);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x55);
+            cpu.load_and_run(vec![0xac, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.y, 0x55);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x55);
+            cpu.load(vec![0xbc, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.y, 0x55);
         }
     }
 }
