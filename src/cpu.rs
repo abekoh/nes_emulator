@@ -88,14 +88,8 @@ impl CPU {
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
             match code {
-                0xA9 => {
+                0xa9 | 0xa5 => {
                     self.lda(&opcode.mode);
-                }
-                0xA5 => {
-                    self.lda(&opcode.mode);
-                }
-                0xAD => {
-                    self.lda(&AddressingMode::ZeroPage);
                 }
                 0x00 => return,
                 _ => todo!()
