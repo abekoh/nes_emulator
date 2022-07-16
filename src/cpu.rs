@@ -242,27 +242,19 @@ impl CPU {
     }
 
     fn update_zero_flag(&mut self, result: u8) {
-        if result == 0 {
-            self.on_flag(&Flag::Zero);
-        } else {
-            self.off_flag(&Flag::Zero);
-        }
+        self.set_flag(&Flag::Zero, result == 0);
     }
 
     fn update_negative_flag(&mut self, result: u8) {
-        if result & 0b1000_0000 != 0 {
-            self.on_flag(&Flag::Negative);
+        self.set_flag(&Flag::Negative, result & 0b1000_0000 != 0);
+    }
+
+    fn set_flag(&mut self, flag: &Flag, val: bool) {
+        if val {
+            self.status = self.status | flag.place();
         } else {
-            self.off_flag(&Flag::Negative);
+            self.status = self.status & !flag.place();
         }
-    }
-
-    fn on_flag(&mut self, flag: &Flag) {
-        self.status = self.status | flag.place();
-    }
-
-    fn off_flag(&mut self, flag: &Flag) {
-        self.status = self.status & !flag.place();
     }
 }
 
