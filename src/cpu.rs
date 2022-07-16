@@ -28,6 +28,34 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
+#[derive(Debug)]
+#[allow(non_camel_case_types)]
+enum Flag {
+    Carry = 0,
+    Zero,
+    IRQ_Limited,
+    Decimal,
+    Break,
+    Reserved,
+    OverFlow,
+    Negative,
+}
+
+impl Flag {
+    fn place(&self) -> u8 {
+        match self {
+            Flag::Carry => 0b0000_0001,
+            Flag::Zero => 0b0000_0010,
+            Flag::IRQ_Limited => 0b0000_0100,
+            Flag::Decimal => 0b0000_1000,
+            Flag::Break => 0b0001_0000,
+            Flag::Reserved => 0b0010_0000,
+            Flag::OverFlow => 0b0100_0000,
+            Flag::Negative => 0b1000_0000,
+        }
+    }
+}
+
 impl CPU {
     pub fn new() -> Self {
         CPU {
@@ -154,8 +182,8 @@ impl CPU {
         let value = self.mem_read(addr);
 
         self.a = value;
-        self.update_zero_flags(self.a);
-        self.update_negative_flags(self.a);
+        self.update_zero_flag(self.a);
+        self.update_negative_flag(self.a);
     }
 
     fn ldx(&mut self, mode: &AddressingMode) {
@@ -163,8 +191,8 @@ impl CPU {
         let value = self.mem_read(addr);
 
         self.x = value;
-        self.update_zero_flags(self.a);
-        self.update_negative_flags(self.a);
+        self.update_zero_flag(self.a);
+        self.update_negative_flag(self.a);
     }
 
     fn ldy(&mut self, mode: &AddressingMode) {
@@ -172,24 +200,32 @@ impl CPU {
         let value = self.mem_read(addr);
 
         self.y = value;
-        self.update_zero_flags(self.a);
-        self.update_negative_flags(self.a);
+        self.update_zero_flag(self.a);
+        self.update_negative_flag(self.a);
     }
 
-    fn update_zero_flags(&mut self, result: u8) {
+    fn update_zero_flag(&mut self, result: u8) {
         if result == 0 {
-            self.status = self.status | 0b0000_0010;
+            self.on_flag(&Flag::Zero);
         } else {
-            self.status = self.status & 0b1111_1101;
+            self.off_flag(&Flag::Zero);
         }
     }
 
-    fn update_negative_flags(&mut self, result: u8) {
+    fn update_negative_flag(&mut self, result: u8) {
         if result & 0b1000_0000 != 0 {
-            self.status = self.status | 0b1000_0000;
+            self.on_flag(&Flag::Negative);
         } else {
-            self.status = self.status & 0b0111_1111;
+            self.off_flag(&Flag::Negative);
         }
+    }
+
+    fn on_flag(&mut self, flag: &Flag) {
+        self.status = self.status | flag.place();
+    }
+
+    fn off_flag(&mut self, flag: &Flag) {
+        self.status = self.status & !flag.place();
     }
 }
 
