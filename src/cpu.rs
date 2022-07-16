@@ -96,12 +96,9 @@ impl CPU {
         self.mem_write(pos + 1, hi);
     }
 
-    pub fn reset(&mut self) {
-        self.a = 0;
-        self.x = 0;
-        self.status = 0;
-
-        self.pc = self.mem_read_u16(0xFFFC);
+    pub fn load_reset(&mut self, program: Vec<u8>) {
+        self.load(program);
+        self.reset();
     }
 
     pub fn load_reset_run(&mut self, program: Vec<u8>) {
@@ -110,14 +107,16 @@ impl CPU {
         self.run();
     }
 
-    pub fn load(&mut self, program: Vec<u8>) {
+    fn load(&mut self, program: Vec<u8>) {
         self.mem[0x8000..(0x8000 + program.len())].copy_from_slice(&program[..]);
         self.mem_write_u16(0xFFFC, 0x8000);
     }
 
-    pub fn load_reset(&mut self, program: Vec<u8>) {
-        self.load(program);
-        self.reset();
+    fn reset(&mut self) {
+        self.a = 0;
+        self.x = 0;
+        self.status = 0;
+        self.pc = self.mem_read_u16(0xFFFC);
     }
 
     pub fn run(&mut self) {
