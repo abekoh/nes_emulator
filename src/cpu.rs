@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::num::Wrapping;
 use std::ops::Add;
-use crate::cpu::IntType::Positive;
 
+use crate::cpu::IntType::{Negative, Positive};
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
 
@@ -62,6 +62,20 @@ impl Flag {
             Flag::OverFlow => 0b0100_0000,
             Flag::Negative => 0b1000_0000,
         }
+    }
+}
+
+#[derive(PartialEq)]
+enum IntType {
+    Positive,
+    Negative,
+}
+
+fn int_type(val: u8) -> IntType {
+    if val & 0b1000_0000 != 0 {
+        IntType::Negative
+    } else {
+        IntType::Positive
     }
 }
 
@@ -251,7 +265,7 @@ impl CPU {
     }
 
     fn update_negative_flag(&mut self, result: u8) {
-        self.set_flag(&Flag::Negative, result & 0b1000_0000 != 0);
+        self.set_flag(&Flag::Negative, int_type(result) == IntType::Negative);
     }
 
     fn get_flag(&self, flag: &Flag) -> bool {
