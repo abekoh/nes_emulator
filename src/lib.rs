@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
@@ -143,12 +141,6 @@ impl CPU {
                 panic!("mode {:?} is not supported", mode);
             }
         }
-    }
-
-    #[deprecated]
-    fn lda_old(&mut self, value: u8) {
-        self.register_a = value;
-        self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn lda(&mut self, mode: &AddressingMode) {
