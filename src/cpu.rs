@@ -473,5 +473,16 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.mem_read(0x01), 0x55);
         }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x95, 0x01, 0x00]);
+            cpu.reset();
+            cpu.a = 0x55;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x02), 0x55);
+        }
     }
 }
