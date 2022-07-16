@@ -38,6 +38,7 @@ pub enum Mnemonic {
     LDX,
     LDY,
     STA,
+    STX,
 }
 
 lazy_static! {
@@ -77,6 +78,11 @@ lazy_static! {
         OpCode::new(0x99, Mnemonic::STA, AddressingMode::Absolute_Y),
         OpCode::new(0x81, Mnemonic::STA, AddressingMode::Indirect_X),
         OpCode::new(0x91, Mnemonic::STA, AddressingMode::Indirect_Y),
+
+        // STX
+        OpCode::new(0x86, Mnemonic::STX, AddressingMode::ZeroPage),
+        OpCode::new(0x96, Mnemonic::STX, AddressingMode::ZeroPage_Y),
+        OpCode::new(0x8e, Mnemonic::STX, AddressingMode::Absolute),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
