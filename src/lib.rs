@@ -79,10 +79,27 @@ impl CPU {
 
     pub fn run(&mut self) {
         loop {
-            let opscode = self.mem_read(self.program_counter);
+            let code = self.mem_read(self.program_counter);
             self.program_counter += 1;
 
-            match opscode { _ => todo!() }
+            match code {
+                0xA9 => {
+                    self.lda(&AddressingMode::Immediate);
+                    self.program_counter += 1;
+                }
+                0xA5 => {
+                    self.lda(&AddressingMode::ZeroPage);
+                    self.program_counter += 1;
+                }
+                0xAD => {
+                    self.lda(&AddressingMode::Absolute);
+                    self.program_counter += 2;
+                }
+                0xAA => self.tax(),
+                0xE8 => self.inx(),
+                0x00 => return,
+                _ => todo!()
+            }
         }
     }
 
@@ -130,16 +147,27 @@ impl CPU {
         }
     }
 
-    fn lda(&mut self, value: u8) {
+    #[deprecated]
+    fn lda_old(&mut self, value: u8) {
         self.register_a = value;
         self.update_zero_and_negative_flags(self.register_a);
     }
 
+    fn lda(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem_read(addr);
+
+        self.register_a = value;
+        self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    #[deprecated]
     fn tax(&mut self) {
         self.register_x = self.register_a;
         self.update_zero_and_negative_flags(self.register_x);
     }
 
+    #[deprecated]
     fn inx(&mut self) {
         self.register_x = self.register_x.overflowing_add(1).0;
         self.update_zero_and_negative_flags(self.register_x);
@@ -159,6 +187,7 @@ impl CPU {
         }
     }
 
+    #[deprecated]
     pub fn interpret(&mut self, program: Vec<u8>) {
         self.program_counter = 0;
         loop {
@@ -166,10 +195,16 @@ impl CPU {
             self.program_counter += 1;
             match opscode {
                 0xA9 => {
-                    let param = program[self.program_counter as usize];
+                    self.lda(&AddressingMode::Immediate);
                     self.program_counter += 1;
-
-                    self.lda(param);
+                }
+                0xA5 => {
+                    self.lda(&AddressingMode::ZeroPage);
+                    self.program_counter += 1;
+                }
+                0xAD => {
+                    self.lda(&AddressingMode::Absolute);
+                    self.program_counter += 2;
                 }
                 0xAA => self.tax(),
                 0xE8 => self.inx(),
@@ -191,6 +226,14 @@ mod test {
         assert_eq!(cpu.register_a, 0x05);
         assert_eq!(cpu.status & 0b0000_0010, 0);
         assert_eq!(cpu.status & 0b1000_0000, 0);
+    }
+
+    #[test]
+    fn test_lda_from_memory() {
+        let mut cpu = CPU::new();
+        cpu.mem_write(0x10, 0x55);
+        cpu.load_and_run(vec![0xa5, 0x10, 0x00]);
+        assert_eq!(cpu.register_a, 0x55);
     }
 
     #[test]
