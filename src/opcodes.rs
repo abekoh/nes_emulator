@@ -22,6 +22,7 @@ impl OpCode {
             AddressingMode::Immediate => 1,
             AddressingMode::ZeroPage => 1,
             AddressingMode::ZeroPage_X => 1,
+            AddressingMode::ZeroPage_Y => 1,
             AddressingMode::Absolute => 2,
             AddressingMode::Absolute_X => 2,
             AddressingMode::Absolute_Y => 2,
@@ -56,6 +57,10 @@ lazy_static! {
 
         // LDX
         OpCode::new(0xa2, Mnemonic::LDX, AddressingMode::Immediate),
+        OpCode::new(0xa6, Mnemonic::LDX, AddressingMode::ZeroPage),
+        OpCode::new(0xb6, Mnemonic::LDX, AddressingMode::ZeroPage_Y),
+        OpCode::new(0xae, Mnemonic::LDX, AddressingMode::Absolute),
+        OpCode::new(0xbe, Mnemonic::LDX, AddressingMode::Absolute_Y),
 
         // LDY
         OpCode::new(0xa0, Mnemonic::LDY, AddressingMode::Immediate),
