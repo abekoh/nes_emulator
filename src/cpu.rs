@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::num::Wrapping;
 use std::ops::Add;
 
 use crate::opcodes;
@@ -688,12 +689,22 @@ mod tests {
         use super::*;
 
         #[test]
-        fn immediate() {
+        fn immediate_no_carry_flag() {
             let mut cpu = CPU::new();
             cpu.load_reset(vec![0x69, 0x11, 0x00]);
             cpu.a = 0x22;
             cpu.run();
             assert_eq!(cpu.a, 0x33);
+        }
+
+        #[test]
+        fn immediate_with_carry_flag() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x69, 0x11, 0x00]);
+            cpu.a = 0x22;
+            cpu.set_flag(&Flag::Carry, true);
+            cpu.run();
+            assert_eq!(cpu.a, 0x34);
         }
     }
 }
