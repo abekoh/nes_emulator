@@ -115,6 +115,11 @@ impl CPU {
         self.mem_write_u16(0xFFFC, 0x8000);
     }
 
+    pub fn load_reset(&mut self, program: Vec<u8>) {
+        self.load(program);
+        self.reset();
+    }
+
     pub fn run(&mut self) {
         let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
         loop {
@@ -314,7 +319,7 @@ mod tests {
         fn zeropage_x() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0x55);
-            cpu.load(vec![0xb5, 0x10, 0x00]);
+            cpu.load_reset(vec![0xb5, 0x10, 0x00]);
             cpu.reset();
             cpu.x = 0x01;
             cpu.run();
@@ -333,7 +338,7 @@ mod tests {
         fn absolute_x() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0x55);
-            cpu.load(vec![0xbd, 0x22, 0x11, 0x00]);
+            cpu.load_reset(vec![0xbd, 0x22, 0x11, 0x00]);
             cpu.reset();
             cpu.x = 0x11;
             cpu.run();
@@ -344,7 +349,7 @@ mod tests {
         fn absolute_y() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0x55);
-            cpu.load(vec![0xb9, 0x22, 0x11, 0x00]);
+            cpu.load_reset(vec![0xb9, 0x22, 0x11, 0x00]);
             cpu.reset();
             cpu.y = 0x11;
             cpu.run();
@@ -357,7 +362,7 @@ mod tests {
             cpu.mem_write(0x0705, 0x0a);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
-            cpu.load(vec![0xa1, 0x00, 0x00]);
+            cpu.load_reset(vec![0xa1, 0x00, 0x00]);
             cpu.reset();
             cpu.x = 0x01;
             cpu.run();
@@ -370,7 +375,7 @@ mod tests {
             cpu.mem_write(0x0704, 0x0a);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
-            cpu.load(vec![0xb1, 0x01, 0x00]);
+            cpu.load_reset(vec![0xb1, 0x01, 0x00]);
             cpu.reset();
             cpu.y = 0x01;
             cpu.run();
@@ -401,8 +406,7 @@ mod tests {
         fn zeropage_y() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0x55);
-            cpu.load(vec![0xb6, 0x10, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0xb6, 0x10, 0x00]);
             cpu.y = 0x01;
             cpu.run();
             assert_eq!(cpu.x, 0x55);
@@ -420,8 +424,7 @@ mod tests {
         fn absolute_y() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0x55);
-            cpu.load(vec![0xbe, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0xbe, 0x22, 0x11, 0x00]);
             cpu.y = 0x11;
             cpu.run();
             assert_eq!(cpu.x, 0x55);
@@ -451,8 +454,7 @@ mod tests {
         fn zeropage_x() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0x55);
-            cpu.load(vec![0xb4, 0x10, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0xb4, 0x10, 0x00]);
             cpu.x = 0x01;
             cpu.run();
             assert_eq!(cpu.y, 0x55);
@@ -470,8 +472,7 @@ mod tests {
         fn absolute_x() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0x55);
-            cpu.load(vec![0xbc, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0xbc, 0x22, 0x11, 0x00]);
             cpu.x = 0x11;
             cpu.run();
             assert_eq!(cpu.y, 0x55);
@@ -485,8 +486,7 @@ mod tests {
         #[test]
         fn zeropage() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x85, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x85, 0x01, 0x00]);
             cpu.a = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x01), 0x55);
@@ -495,8 +495,7 @@ mod tests {
         #[test]
         fn zeropage_x() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x95, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x95, 0x01, 0x00]);
             cpu.a = 0x55;
             cpu.x = 0x01;
             cpu.run();
@@ -506,8 +505,7 @@ mod tests {
         #[test]
         fn absolute() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x8d, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x8d, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x1122), 0x55);
@@ -516,8 +514,7 @@ mod tests {
         #[test]
         fn absolute_x() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x9d, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x9d, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.x = 0x33;
             cpu.run();
@@ -527,8 +524,7 @@ mod tests {
         #[test]
         fn absolute_y() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x99, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x99, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.y = 0x33;
             cpu.run();
@@ -540,8 +536,7 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
-            cpu.load(vec![0x81, 0x00, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x81, 0x00, 0x00]);
             cpu.a = 0x55;
             cpu.x = 0x01;
             cpu.run();
@@ -553,8 +548,7 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
-            cpu.load(vec![0x91, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x91, 0x01, 0x00]);
             cpu.a = 0x55;
             cpu.y = 0x01;
             cpu.run();
@@ -569,8 +563,7 @@ mod tests {
         #[test]
         fn zeropage() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x86, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x86, 0x01, 0x00]);
             cpu.x = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x01), 0x55);
@@ -579,8 +572,7 @@ mod tests {
         #[test]
         fn zeropage_y() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x96, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x96, 0x01, 0x00]);
             cpu.x = 0x55;
             cpu.y = 0x01;
             cpu.run();
@@ -590,8 +582,7 @@ mod tests {
         #[test]
         fn absolute() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x8e, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x8e, 0x22, 0x11, 0x00]);
             cpu.x = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x1122), 0x55);
@@ -605,8 +596,7 @@ mod tests {
         #[test]
         fn zeropage() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x84, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x84, 0x01, 0x00]);
             cpu.y = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x01), 0x55);
@@ -615,8 +605,7 @@ mod tests {
         #[test]
         fn zeropage_y() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x94, 0x01, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x94, 0x01, 0x00]);
             cpu.x = 0x01;
             cpu.y = 0x55;
             cpu.run();
@@ -626,8 +615,7 @@ mod tests {
         #[test]
         fn absolute() {
             let mut cpu = CPU::new();
-            cpu.load(vec![0x8c, 0x22, 0x11, 0x00]);
-            cpu.reset();
+            cpu.load_reset(vec![0x8c, 0x22, 0x11, 0x00]);
             cpu.y = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x1122), 0x55);
@@ -637,8 +625,7 @@ mod tests {
     #[test]
     fn tax() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0xaa, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0xaa, 0x00]);
         cpu.a = 0x55;
         cpu.run();
         assert_eq!(cpu.x, 0x55);
@@ -647,8 +634,7 @@ mod tests {
     #[test]
     fn tay() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0xa8, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0xa8, 0x00]);
         cpu.a = 0x55;
         cpu.run();
         assert_eq!(cpu.y, 0x55);
@@ -657,8 +643,7 @@ mod tests {
     #[test]
     fn tsx() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0xba, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0xba, 0x00]);
         cpu.sp = 0x55;
         cpu.run();
         assert_eq!(cpu.x, 0x55);
@@ -667,8 +652,7 @@ mod tests {
     #[test]
     fn txa() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0x8a, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0x8a, 0x00]);
         cpu.x = 0x55;
         cpu.run();
         assert_eq!(cpu.a, 0x55);
@@ -677,8 +661,7 @@ mod tests {
     #[test]
     fn txs() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0x9a, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0x9a, 0x00]);
         cpu.x = 0x55;
         cpu.run();
         assert_eq!(cpu.sp, 0x55);
@@ -687,8 +670,7 @@ mod tests {
     #[test]
     fn tya() {
         let mut cpu = CPU::new();
-        cpu.load(vec![0x98, 0x00]);
-        cpu.reset();
+        cpu.load_reset(vec![0x98, 0x00]);
         cpu.y = 0x55;
         cpu.run();
         assert_eq!(cpu.a, 0x55);
