@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::opcodes;
+use crate::opcodes::Mnemonic;
 
 pub struct CPU {
     pub a: u8,
@@ -87,20 +88,20 @@ impl CPU {
 
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
-            match code {
-                0xa9 | 0xa5 | 0xb5 | 0xad => {
+            match &(opcode.mnemonic) {
+                Mnemonic::LDA => {
                     self.lda(&opcode.mode);
                 }
-                0xa2 => {
+                Mnemonic::LDX => {
                     self.ldx(&opcode.mode);
                 }
-                0xa0 => {
+                Mnemonic::LDY => {
                     self.ldy(&opcode.mode);
                 }
-                0x00 => return,
+                Mnemonic::BRK => return,
                 _ => todo!()
             }
-            self.pc += (opcode.len - 1) as u16;
+            self.pc += opcode.pc_offset() as u16;
         }
     }
 
