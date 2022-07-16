@@ -26,6 +26,7 @@ lazy_static! {
         // LDA
         OpCode::new(0xa9, 2, AddressingMode::Immediate),
         OpCode::new(0xa5, 2, AddressingMode::ZeroPage),
+        OpCode::new(0xb5, 2, AddressingMode::ZeroPage_X),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

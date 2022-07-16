@@ -88,7 +88,7 @@ impl CPU {
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
             match code {
-                0xa9 | 0xa5 => {
+                0xa9 | 0xa5 | 0xb5 => {
                     self.lda(&opcode.mode);
                 }
                 0x00 => return,
@@ -105,7 +105,8 @@ impl CPU {
             AddressingMode::Absolute => self.mem_read_u16(self.pc),
             AddressingMode::ZeroPage_X => {
                 let pos = self.mem_read(self.pc);
-                pos.wrapping_add(self.x) as u16
+                let addr = pos.wrapping_add(self.x) as u16;
+                addr
             }
             AddressingMode::ZeroPage_Y => {
                 let pos = self.mem_read(self.pc);
@@ -185,6 +186,16 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x55);
             cpu.load_and_run(vec![0xa5, 0x10, 0x00]);
+            assert_eq!(cpu.a, 0x55);
+        }
+
+        #[test]
+        #[ignore]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.x = 0x01;
+            cpu.mem_write(0x11, 0x55);
+            cpu.load_and_run(vec![0xb5, 0x10, 0x00]);
             assert_eq!(cpu.a, 0x55);
         }
     }
