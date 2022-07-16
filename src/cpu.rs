@@ -174,6 +174,13 @@ mod tests {
         use super::*;
 
         #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_and_run(vec![0xa9, 0x11, 0x00]);
+            assert_eq!(cpu.a, 0x11);
+        }
+
+        #[test]
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x55);
