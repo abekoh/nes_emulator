@@ -200,7 +200,6 @@ impl CPU {
     fn ld(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let val = self.mem_read(addr);
-
         self.set_register(reg, val);
         self.update_zero_flag(val);
         self.update_negative_flag(val);
