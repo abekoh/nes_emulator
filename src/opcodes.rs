@@ -30,6 +30,9 @@ lazy_static! {
 
         // LDX
         OpCode::new(0xa2, 2, AddressingMode::Immediate),
+
+        // LDY
+        OpCode::new(0xa0, 2, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
