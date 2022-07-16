@@ -133,6 +133,9 @@ impl CPU {
                 Mnemonic::TAX => self.t(&Register::A, &Register::X),
                 Mnemonic::TAY => self.t(&Register::A, &Register::Y),
                 Mnemonic::TSX => self.t(&Register::S, &Register::X),
+                Mnemonic::TXA => self.t(&Register::X, &Register::A),
+                Mnemonic::TXS => self.t(&Register::X, &Register::S),
+                Mnemonic::TYA => self.t(&Register::Y, &Register::A),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -659,5 +662,35 @@ mod tests {
         cpu.sp = 0x55;
         cpu.run();
         assert_eq!(cpu.x, 0x55);
+    }
+
+    #[test]
+    fn txa() {
+        let mut cpu = CPU::new();
+        cpu.load(vec![0x8a, 0x00]);
+        cpu.reset();
+        cpu.x = 0x55;
+        cpu.run();
+        assert_eq!(cpu.a, 0x55);
+    }
+
+    #[test]
+    fn txs() {
+        let mut cpu = CPU::new();
+        cpu.load(vec![0x9a, 0x00]);
+        cpu.reset();
+        cpu.x = 0x55;
+        cpu.run();
+        assert_eq!(cpu.sp, 0x55);
+    }
+
+    #[test]
+    fn tya() {
+        let mut cpu = CPU::new();
+        cpu.load(vec![0x98, 0x00]);
+        cpu.reset();
+        cpu.y = 0x55;
+        cpu.run();
+        assert_eq!(cpu.a, 0x55);
     }
 }
