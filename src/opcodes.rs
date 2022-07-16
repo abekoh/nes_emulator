@@ -28,16 +28,16 @@ impl OpCode {
             AddressingMode::Absolute_Y => 2,
             AddressingMode::Indirect_X => 1,
             AddressingMode::Indirect_Y => 1,
-            _ => todo!()
         }
     }
 }
 
 pub enum Mnemonic {
+    BRK,
     LDA,
     LDX,
     LDY,
-    BRK,
+    STA,
 }
 
 lazy_static! {
@@ -68,6 +68,15 @@ lazy_static! {
         OpCode::new(0xb4, Mnemonic::LDY, AddressingMode::ZeroPage_X),
         OpCode::new(0xac, Mnemonic::LDY, AddressingMode::Absolute),
         OpCode::new(0xbc, Mnemonic::LDY, AddressingMode::Absolute_X),
+
+        // STA
+        OpCode::new(0x85, Mnemonic::STA, AddressingMode::ZeroPage),
+        OpCode::new(0x95, Mnemonic::STA, AddressingMode::ZeroPage_X),
+        OpCode::new(0x8d, Mnemonic::STA, AddressingMode::Absolute),
+        OpCode::new(0x9d, Mnemonic::STA, AddressingMode::Absolute_X),
+        OpCode::new(0x99, Mnemonic::STA, AddressingMode::Absolute_Y),
+        OpCode::new(0x81, Mnemonic::STA, AddressingMode::Indirect_X),
+        OpCode::new(0x91, Mnemonic::STA, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

@@ -28,10 +28,9 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
-#[derive(Debug)]
 #[allow(non_camel_case_types)]
 enum Flag {
-    Carry = 0,
+    Carry,
     Zero,
     IRQ_Limited,
     Decimal,
@@ -68,7 +67,7 @@ impl CPU {
         }
     }
 
-    fn mem_read(&self, addr: u16) -> u8 {
+    pub fn mem_read(&self, addr: u16) -> u8 {
         self.mem[addr as usize]
     }
 
@@ -117,15 +116,10 @@ impl CPU {
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
             match &(opcode.mnemonic) {
-                Mnemonic::LDA => {
-                    self.lda(&opcode.mode);
-                }
-                Mnemonic::LDX => {
-                    self.ldx(&opcode.mode);
-                }
-                Mnemonic::LDY => {
-                    self.ldy(&opcode.mode);
-                }
+                Mnemonic::LDA => self.lda(&opcode.mode),
+                Mnemonic::LDX => self.ldx(&opcode.mode),
+                Mnemonic::LDY => self.ldy(&opcode.mode),
+                Mnemonic::STA => self.sta(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -202,6 +196,11 @@ impl CPU {
         self.y = value;
         self.update_zero_flag(self.y);
         self.update_negative_flag(self.y);
+    }
+
+    fn sta(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        self.mem_write(addr, self.a);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -454,6 +453,21 @@ mod tests {
             cpu.x = 0x11;
             cpu.run();
             assert_eq!(cpu.y, 0x55);
+        }
+    }
+
+    #[cfg(test)]
+    mod sta {
+        use super::*;
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x85, 0x01, 0x00]);
+            cpu.reset();
+            cpu.a = 0x55;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x01), 0x55);
         }
     }
 }
