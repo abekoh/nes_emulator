@@ -212,12 +212,13 @@ mod tests {
         }
 
         #[test]
-        #[ignore]
         fn zeropage_x() {
             let mut cpu = CPU::new();
-            cpu.x = 0x01;
             cpu.mem_write(0x11, 0x55);
-            cpu.load_and_run(vec![0xb5, 0x10, 0x00]);
+            cpu.load(vec![0xb5, 0x10, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.run();
             assert_eq!(cpu.a, 0x55);
         }
     }
