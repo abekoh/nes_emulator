@@ -27,6 +27,11 @@ lazy_static! {
         OpCode::new(0xa9, 2, AddressingMode::Immediate),
         OpCode::new(0xa5, 2, AddressingMode::ZeroPage),
         OpCode::new(0xb5, 2, AddressingMode::ZeroPage_X),
+        OpCode::new(0xad, 3, AddressingMode::Absolute),
+        OpCode::new(0xbd, 3, AddressingMode::Absolute_X),
+        OpCode::new(0xb9, 3, AddressingMode::Absolute_Y),
+        OpCode::new(0xa1, 2, AddressingMode::Indirect_X),
+        OpCode::new(0xb1, 2, AddressingMode::Indirect_X),
 
         // LDX
         OpCode::new(0xa2, 2, AddressingMode::Immediate),

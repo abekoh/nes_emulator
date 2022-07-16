@@ -88,7 +88,7 @@ impl CPU {
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
             match code {
-                0xa9 | 0xa5 | 0xb5 => {
+                0xa9 | 0xa5 | 0xb5 | 0xad => {
                     self.lda(&opcode.mode);
                 }
                 0xa2 => {
@@ -219,6 +219,14 @@ mod tests {
             cpu.reset();
             cpu.x = 0x01;
             cpu.run();
+            assert_eq!(cpu.a, 0x55);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x55);
+            cpu.load_and_run(vec![0xad, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.a, 0x55);
         }
     }
