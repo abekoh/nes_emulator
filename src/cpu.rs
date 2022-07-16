@@ -212,9 +212,25 @@ mod tests {
         #[test]
         fn zero_off() {
             let mut cpu = CPU::new();
-            // LDA #$00
+            // LDA #$01
             cpu.load_and_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b00);
+        }
+
+        #[test]
+        fn negative_on() {
+            let mut cpu = CPU::new();
+            // LDA #$ff
+            cpu.load_and_run(vec![0xa9, 0xff, 0x00]);
+            assert_eq!(cpu.status & 0b1000_0000, 0b1000_0000);
+        }
+
+        #[test]
+        fn negative_off() {
+            let mut cpu = CPU::new();
+            // LDA #$01
+            cpu.load_and_run(vec![0xa9, 0x01, 0x00]);
+            assert_eq!(cpu.status & 0b1000_0000, 0b0000_0000);
         }
     }
 
