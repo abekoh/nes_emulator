@@ -127,6 +127,7 @@ impl CPU {
                 Mnemonic::LDY => self.ld(&Register::Y, &opcode.mode),
                 Mnemonic::STA => self.st(&Register::A, &opcode.mode),
                 Mnemonic::STX => self.st(&Register::X, &opcode.mode),
+                Mnemonic::STY => self.st(&Register::Y, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -576,6 +577,42 @@ mod tests {
             cpu.load(vec![0x8e, 0x22, 0x11, 0x00]);
             cpu.reset();
             cpu.x = 0x55;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1122), 0x55);
+        }
+    }
+
+    #[cfg(test)]
+    mod sty {
+        use super::*;
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x84, 0x01, 0x00]);
+            cpu.reset();
+            cpu.y = 0x55;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x01), 0x55);
+        }
+
+        #[test]
+        fn zeropage_y() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x94, 0x01, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.y = 0x55;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x02), 0x55);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.load(vec![0x8c, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.y = 0x55;
             cpu.run();
             assert_eq!(cpu.mem_read(0x1122), 0x55);
         }
