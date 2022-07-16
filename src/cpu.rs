@@ -198,6 +198,19 @@ mod tests {
     use super::*;
 
     #[cfg(test)]
+    mod zero_flag {
+        use super::*;
+
+        #[test]
+        fn zero() {
+            let mut cpu = CPU::new();
+            // LDA #$00
+            cpu.load_and_run(vec![0xa9, 0x00, 0x00]);
+            assert_eq!(cpu.status & 0b0000_0010, 0b10);
+        }
+    }
+
+    #[cfg(test)]
     mod lda {
         use super::*;
 
