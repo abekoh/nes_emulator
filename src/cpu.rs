@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use crate::opcodes;
+
 pub struct CPU {
     pub a: u8,
     pub x: u8,
@@ -76,26 +80,27 @@ impl CPU {
     }
 
     pub fn run(&mut self) {
+        let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
         loop {
             let code = self.mem_read(self.pc);
             self.pc += 1;
 
+            let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
+
             match code {
                 0xA9 => {
-                    self.lda(&AddressingMode::Immediate);
-                    self.pc += 1;
+                    self.lda(&opcode.mode);
                 }
                 0xA5 => {
-                    self.lda(&AddressingMode::ZeroPage);
-                    self.pc += 1;
+                    self.lda(&opcode.mode);
                 }
                 0xAD => {
-                    self.lda(&AddressingMode::Absolute);
-                    self.pc += 2;
+                    self.lda(&AddressingMode::ZeroPage);
                 }
                 0x00 => return,
                 _ => todo!()
             }
+            self.pc += (opcode.len - 1) as u16;
         }
     }
 
