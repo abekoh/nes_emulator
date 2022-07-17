@@ -150,6 +150,7 @@ lazy_static! {
 
         // ASL
         OpCode::new(0x0a, Mnemonic::ASL, AddressingMode::NoneAddressing),
+        OpCode::new(0x06, Mnemonic::ASL, AddressingMode::ZeroPage),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

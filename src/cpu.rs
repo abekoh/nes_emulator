@@ -278,14 +278,21 @@ impl CPU {
     }
 
     fn asl(&mut self, mode: &AddressingMode) {
-        // TODO: addressing
         match mode {
             AddressingMode::NoneAddressing => {
                 let (res, over) = self.a.overflowing_shl(1);
                 self.set_flag(&Flag::Carry, over);
                 self.set_register_with_update_flags(&Register::A, res);
             }
-            _ => todo!()
+            _ => {
+                let addr = self.get_operand_address(mode);
+                let mem_val = self.mem_read(addr);
+                let (res, over) = mem_val.overflowing_shl(1);
+                self.mem_write(addr, res);
+                self.set_flag(&Flag::Carry, over);
+                self.update_zero_flag(res);
+                self.update_negative_flag(res);
+            }
         };
     }
 
@@ -1097,6 +1104,16 @@ mod tests {
             cpu.a = 0b0101;
             cpu.run();
             assert_eq!(cpu.a, 0b1010);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0b0101);
+            cpu.load_reset(vec![0x06, 0x10, 0x00]);
+            cpu.a = 0b1010;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x10), 0b1010);
         }
     }
 }
