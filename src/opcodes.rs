@@ -186,6 +186,9 @@ lazy_static! {
 
         // DEC
         OpCode::new(0xc6, Mnemonic::DEC, AddressingMode::ZeroPage),
+        OpCode::new(0xd6, Mnemonic::DEC, AddressingMode::ZeroPage_X),
+        OpCode::new(0xce, Mnemonic::DEC, AddressingMode::Absolute),
+        OpCode::new(0xde, Mnemonic::DEC, AddressingMode::Absolute_X),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

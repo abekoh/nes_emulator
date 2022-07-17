@@ -1454,9 +1454,36 @@ mod tests {
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0x11);
-            cpu.load_reset(vec![0xc6, 0x10, 0x00]);
-            cpu.run();
+            cpu.load_reset_run(vec![0xc6, 0x10, 0x00]);
             assert_eq!(cpu.mem_read(0x10), 0x10);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0x11);
+            cpu.load_reset(vec![0xd6, 0x10, 0x00]);
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x11), 0x10);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x11);
+            cpu.load_reset_run(vec![0xce, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.mem_read(0x1122), 0x10);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x11);
+            cpu.load_reset(vec![0xde, 0x22, 0x11, 0x00]);
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1133), 0x10);
         }
     }
 }
