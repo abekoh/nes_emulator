@@ -1311,7 +1311,6 @@ mod tests {
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xcd, 0x22, 0x11, 0x00]);
             cpu.a = 0x22;
-            cpu.x = 0x01;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
@@ -1377,6 +1376,26 @@ mod tests {
         fn immediate() {
             let mut cpu = CPU::new();
             cpu.load_reset(vec![0xe0, 0x11, 0x00]);
+            cpu.x = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x11);
+            cpu.load_reset(vec![0xe4, 0x10, 0x00]);
+            cpu.x = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x11);
+            cpu.load_reset(vec![0xec, 0x22, 0x11, 0x00]);
             cpu.x = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
