@@ -97,6 +97,12 @@ impl CPU {
         self.mem[addr as usize] = data;
     }
 
+    fn mem_write_with_update_flags(&mut self, addr: u16, data: u8) {
+        self.mem[addr as usize] = data;
+        self.update_zero_flag(data);
+        self.update_negative_flag(data);
+    }
+
     fn mem_read_u16(&self, pos: u16) -> u16 {
         let lo = self.mem_read(pos) as u16;
         let hi = self.mem_read(pos + 1) as u16;
@@ -300,10 +306,8 @@ impl CPU {
                 let addr = self.get_operand_address(mode);
                 let mem_val = self.mem_read(addr);
                 let (res, over) = mem_val.overflowing_shl(1);
-                self.mem_write(addr, res);
                 self.set_flag(&Flag::Carry, over);
-                self.update_zero_flag(res);
-                self.update_negative_flag(res);
+                self.mem_write_with_update_flags(addr, res);
             }
         };
     }
@@ -330,18 +334,14 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let res = mem_val.wrapping_sub(1);
-        self.mem_write(addr, res);
-        self.update_zero_flag(res);
-        self.update_negative_flag(res);
+        self.mem_write_with_update_flags(addr, res);
     }
 
     fn inc_mem(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let res = mem_val.wrapping_add(1);
-        self.mem_write(addr, res);
-        self.update_zero_flag(res);
-        self.update_negative_flag(res);
+        self.mem_write_with_update_flags(addr, res);
     }
 
     fn dec_reg(&mut self, reg: &Register) {
