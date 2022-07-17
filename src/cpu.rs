@@ -162,10 +162,12 @@ impl CPU {
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
                 Mnemonic::CPY => self.cmp(&Register::Y, &opcode.mode),
-                Mnemonic::DEC => self.dec(&opcode.mode),
-                Mnemonic::INC => self.inc(&opcode.mode),
-                Mnemonic::DEX => self.de(&Register::X),
-                Mnemonic::DEY => self.de(&Register::Y),
+                Mnemonic::DEC => self.dec_mem(&opcode.mode),
+                Mnemonic::INC => self.inc_mem(&opcode.mode),
+                Mnemonic::DEX => self.dec_reg(&Register::X),
+                Mnemonic::DEY => self.dec_reg(&Register::Y),
+                Mnemonic::INX => self.inc_reg(&Register::X),
+                Mnemonic::INY => self.inc_reg(&Register::Y),
                 Mnemonic::EOR => self.eor(&opcode.mode),
                 Mnemonic::BRK => return,
             }
@@ -324,7 +326,7 @@ impl CPU {
         self.update_negative_flag(sub_val);
     }
 
-    fn dec(&mut self, mode: &AddressingMode) {
+    fn dec_mem(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let res = mem_val.wrapping_sub(1);
@@ -333,7 +335,7 @@ impl CPU {
         self.update_negative_flag(res);
     }
 
-    fn inc(&mut self, mode: &AddressingMode) {
+    fn inc_mem(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let res = mem_val.wrapping_add(1);
@@ -342,9 +344,15 @@ impl CPU {
         self.update_negative_flag(res);
     }
 
-    fn de(&mut self, reg: &Register) {
+    fn dec_reg(&mut self, reg: &Register) {
         let reg_val = self.get_register(reg);
         let res = reg_val.wrapping_sub(1);
+        self.set_register_with_update_flags(reg, res);
+    }
+
+    fn inc_reg(&mut self, reg: &Register) {
+        let reg_val = self.get_register(reg);
+        let res = reg_val.wrapping_add(1);
         self.set_register_with_update_flags(reg, res);
     }
 
@@ -1572,6 +1580,24 @@ mod tests {
         cpu.y = 0x11;
         cpu.run();
         assert_eq!(cpu.y, 0x10)
+    }
+
+    #[test]
+    fn inx() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0xe8, 0x00]);
+        cpu.x = 0x11;
+        cpu.run();
+        assert_eq!(cpu.x, 0x12)
+    }
+
+    #[test]
+    fn iny() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0xc8, 0x00]);
+        cpu.y = 0x11;
+        cpu.run();
+        assert_eq!(cpu.y, 0x12)
     }
 
     #[cfg(test)]

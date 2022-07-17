@@ -58,6 +58,8 @@ pub enum Mnemonic {
     INC,
     DEX,
     DEY,
+    INX,
+    INY,
     EOR,
 }
 
@@ -205,6 +207,12 @@ lazy_static! {
 
         // DEY
         OpCode::new(0x88, Mnemonic::DEY, AddressingMode::NoneAddressing),
+
+        // INX
+        OpCode::new(0xe8, Mnemonic::INX, AddressingMode::NoneAddressing),
+
+        // INY
+        OpCode::new(0xc8, Mnemonic::INY, AddressingMode::NoneAddressing),
 
         // EOR
         OpCode::new(0x49, Mnemonic::EOR, AddressingMode::Immediate),
