@@ -301,9 +301,10 @@ impl CPU {
     fn asl(&mut self, mode: &AddressingMode) {
         match mode {
             AddressingMode::NoneAddressing => {
-                let (res, over) = self.a.overflowing_shl(1);
-                self.set_flag(&Flag::Carry, over);
+                let reg_val = self.get_register(&Register::A);
+                let res = reg_val.wrapping_shl(1);
                 self.set_register_with_update_flags(&Register::A, res);
+                self.set_flag(&Flag::Carry, reg_val & 0b1000_0000 != 0);
             }
             _ => {
                 let addr = self.get_operand_address(mode);
