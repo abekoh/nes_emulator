@@ -252,7 +252,7 @@ impl CPU {
         let (res, over2) = res.overflowing_add(carry_val);
         self.set_flag(&Flag::Carry, over1 || over2);
         self.set_flag(&Flag::OverFlow, (res ^ param) & (res ^ self.a) & 0b1000_0000 != 0);
-        self.a = res;
+        self.set_register(&Register::A, res);
         self.update_zero_flag(res);
         self.update_negative_flag(res);
     }
