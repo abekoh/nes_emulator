@@ -2195,4 +2195,14 @@ mod tests {
         assert_eq!(cpu.pc, 0x3345);
         assert_eq!(cpu.mem_read_u16(0x01ff), 0x8002);
     }
+
+    #[test]
+    fn rts() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x60]);
+        cpu.stack_push_u16(0x1122);
+        cpu.run();
+        assert_eq!(cpu.pc, 0x1123);
+        assert_eq!(cpu.sp, SP_BEGIN);
+    }
 }
