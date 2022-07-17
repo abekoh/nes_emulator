@@ -43,6 +43,7 @@ enum Flag {
     Negative,
 }
 
+#[derive(PartialEq)]
 enum Register {
     A,
     X,
@@ -438,6 +439,10 @@ impl CPU {
         let addr = STACK_BEGIN + (self.sp as u16);
         let val = self.mem_read(addr);
         self.set_register(reg, val);
+        if *reg == Register::A {
+            self.update_zero_flag(val);
+            self.update_negative_flag(val);
+        }
         self.inc_sp();
     }
 
