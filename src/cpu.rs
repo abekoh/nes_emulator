@@ -163,9 +163,9 @@ impl CPU {
                 Mnemonic::ADC => self.adc(&opcode.mode),
                 Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
-                Mnemonic::ASL => self.asl(&opcode.mode),
+                Mnemonic::ASL => self.shift_left(&opcode.mode, false),
                 Mnemonic::LSR => self.lsr(&opcode.mode),
-                Mnemonic::ROL => self.rol(&opcode.mode),
+                Mnemonic::ROL => self.shift_left(&opcode.mode, true),
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
@@ -298,20 +298,21 @@ impl CPU {
         self.set_register_with_update_flags(&Register::A, val);
     }
 
-    fn asl(&mut self, mode: &AddressingMode) {
+    fn shift_left(&mut self, mode: &AddressingMode, use_carry: bool) {
+        let carry_val: u8 = if use_carry && self.get_flag(&Flag::Carry) { 1 } else { 0 };
         match mode {
             AddressingMode::NoneAddressing => {
                 let reg_val = self.get_register(&Register::A);
-                let res = reg_val.wrapping_shl(1);
+                let res = reg_val.wrapping_shl(1).wrapping_add(carry_val);
                 self.set_register_with_update_flags(&Register::A, res);
                 self.set_flag(&Flag::Carry, reg_val & 0b1000_0000 != 0);
             }
             _ => {
                 let addr = self.get_operand_address(mode);
                 let mem_val = self.mem_read(addr);
-                let (res, over) = mem_val.overflowing_shl(1);
-                self.set_flag(&Flag::Carry, over);
+                let res = mem_val.wrapping_shl(1).wrapping_add(carry_val);
                 self.mem_write_with_update_flags(addr, res);
+                self.set_flag(&Flag::Carry, mem_val & 0b1000_0000 != 0);
             }
         };
     }
