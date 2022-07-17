@@ -162,6 +162,7 @@ impl CPU {
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
                 Mnemonic::CPY => self.cmp(&Register::Y, &opcode.mode),
+                Mnemonic::DEC => self.dec(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -318,6 +319,14 @@ impl CPU {
         self.update_negative_flag(sub_val);
     }
 
+    fn dec(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let res = mem_val - 1;
+        self.mem_write(addr, res);
+        self.update_zero_flag(res);
+        self.update_negative_flag(res);
+    }
 
     fn update_zero_flag(&mut self, result: u8) {
         self.set_flag(&Flag::Zero, result == 0);
@@ -1434,6 +1443,20 @@ mod tests {
             cpu.y = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+    }
+
+    #[cfg(test)]
+    mod dec {
+        use super::*;
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x11);
+            cpu.load_reset(vec![0xc6, 0x10, 0x00]);
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x10), 0x10);
         }
     }
 }
