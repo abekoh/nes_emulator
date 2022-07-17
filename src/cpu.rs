@@ -164,7 +164,7 @@ impl CPU {
                 Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.shift_left(&opcode.mode, false),
-                Mnemonic::LSR => self.lsr(&opcode.mode),
+                Mnemonic::LSR => self.shift_right(&opcode.mode, false),
                 Mnemonic::ROL => self.shift_left(&opcode.mode, true),
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
@@ -317,7 +317,8 @@ impl CPU {
         };
     }
 
-    fn lsr(&mut self, mode: &AddressingMode) {
+    fn shift_right(&mut self, mode: &AddressingMode, use_carry: bool) {
+        let carry_val: u8 = if use_carry && self.get_flag(&Flag::Carry) { 0b1000_0000 } else { 0 };
         match mode {
             AddressingMode::NoneAddressing => {
                 let reg_val = self.get_register(&Register::A);
