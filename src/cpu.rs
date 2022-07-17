@@ -2159,4 +2159,13 @@ mod tests {
             assert_eq!(cpu.pc, 0x5567);
         }
     }
+
+    #[test]
+    fn jsr() {
+        let mut cpu = CPU::new();
+        cpu.mem_write_u16(0x1122, 0x3344);
+        cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0x00]);
+        assert_eq!(cpu.pc, 0x3345);
+        assert_eq!(cpu.mem_read_u16(0x01ff), 0x8002);
+    }
 }
