@@ -2155,10 +2155,10 @@ mod tests {
         let mut cpu = CPU::new();
         cpu.mem_write(0x01bb, 0xaa);
         cpu.load_reset(vec![0x68, 0x00]);
-        cpu.sp = 0xbb;
+        cpu.sp = 0xba;
         cpu.run();
         assert_eq!(cpu.a, 0xaa);
-        assert_eq!(cpu.sp, 0xbc);
+        assert_eq!(cpu.sp, 0xbb);
     }
 
     #[test]
@@ -2166,10 +2166,10 @@ mod tests {
         let mut cpu = CPU::new();
         cpu.mem_write(0x01bb, 0xaa);
         cpu.load_reset(vec![0x28, 0x00]);
-        cpu.sp = 0xbb;
+        cpu.sp = 0xba;
         cpu.run();
         assert_eq!(cpu.status, 0xaa);
-        assert_eq!(cpu.sp, 0xbc);
+        assert_eq!(cpu.sp, 0xbb);
     }
 
     #[cfg(test)]
