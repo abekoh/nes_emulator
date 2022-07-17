@@ -224,7 +224,6 @@ impl CPU {
             }
             AddressingMode::Indirect_X => {
                 let base = self.mem_read(self.pc);
-
                 let ptr: u8 = (base as u8).wrapping_add(self.x);
                 let lo = self.mem_read(ptr as u16);
                 let hi = self.mem_read(ptr.wrapping_add(1) as u16);
@@ -232,7 +231,6 @@ impl CPU {
             }
             AddressingMode::Indirect_Y => {
                 let base = self.mem_read(self.pc);
-
                 let lo = self.mem_read(base as u16);
                 let hi = self.mem_read((base as u16).wrapping_add(1) as u16);
                 let deref_base = (hi as u16) << 8 | (lo as u16);
@@ -2129,6 +2127,15 @@ mod tests {
             cpu.mem_write_u16(0x1122, 0x3344);
             cpu.load_reset_run(vec![0x4c, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.pc, 0x3345);
+        }
+
+        #[test]
+        fn indirect() {
+            let mut cpu = CPU::new();
+            cpu.mem_write_u16(0x1122, 0x3344);
+            cpu.mem_write_u16(0x3344, 0x5566);
+            cpu.load_reset_run(vec![0x6c, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.pc, 0x5567);
         }
     }
 }
