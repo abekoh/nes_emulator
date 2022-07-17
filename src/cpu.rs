@@ -164,6 +164,7 @@ impl CPU {
                 Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.asl(&opcode.mode),
+                Mnemonic::LSR => self.lsr(&opcode.mode),
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
@@ -308,6 +309,25 @@ impl CPU {
                 let (res, over) = mem_val.overflowing_shl(1);
                 self.set_flag(&Flag::Carry, over);
                 self.mem_write_with_update_flags(addr, res);
+            }
+        };
+    }
+
+    fn lsr(&mut self, mode: &AddressingMode) {
+        match mode {
+            AddressingMode::NoneAddressing => {
+                let reg_val = self.get_register(&Register::A);
+                self.set_flag(&Flag::Carry, reg_val & 0b0000_0001 != 0);
+                let res = reg_val.wrapping_shr(1);
+                self.set_register_with_update_flags(&Register::A, res);
+            }
+            _ => {
+                todo!();
+                // let addr = self.get_operand_address(mode);
+                // let mem_val = self.mem_read(addr);
+                // let (res, over) = mem_val.overflowing_shl(1);
+                // self.set_flag(&Flag::Carry, over);
+                // self.mem_write_with_update_flags(addr, res);
             }
         };
     }
@@ -1720,7 +1740,7 @@ mod tests {
             cpu.load_reset(vec![0x4a, 0x00]);
             cpu.a = 0b0101_0101;
             cpu.run();
-            assert_eq!(cpu.a, 0b1010_1010);
+            assert_eq!(cpu.a, 0b0010_1010);
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
     }
