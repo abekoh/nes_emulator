@@ -508,7 +508,7 @@ impl CPU {
     fn jsr(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read_u16(addr);
-        self.stack_push_u16(self.pc);
+        self.stack_push_u16(self.pc + (mode.pc_offset() - 1));
         self.pc = mem_val;
         self.jumped = true;
     }
