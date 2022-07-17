@@ -201,6 +201,13 @@ lazy_static! {
 
         // EOR
         OpCode::new(0x49, Mnemonic::EOR, AddressingMode::Immediate),
+        OpCode::new(0x45, Mnemonic::EOR, AddressingMode::ZeroPage),
+        OpCode::new(0x55, Mnemonic::EOR, AddressingMode::ZeroPage_X),
+        OpCode::new(0x4d, Mnemonic::EOR, AddressingMode::Absolute),
+        OpCode::new(0x5d, Mnemonic::EOR, AddressingMode::Absolute_X),
+        OpCode::new(0x59, Mnemonic::EOR, AddressingMode::Absolute_Y),
+        OpCode::new(0x41, Mnemonic::EOR, AddressingMode::Indirect_X),
+        OpCode::new(0x51, Mnemonic::EOR, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
