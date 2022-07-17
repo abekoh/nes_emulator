@@ -158,6 +158,7 @@ lazy_static! {
 
         // BIT
         OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),
+        OpCode::new(0x2c, Mnemonic::BIT, AddressingMode::Absolute),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

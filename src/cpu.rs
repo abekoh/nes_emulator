@@ -1197,5 +1197,41 @@ mod tests {
             assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
             assert_eq!(cpu.get_flag(&Flag::Negative), true);
         }
+
+        #[test]
+        fn absolute_zero() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b_0000_0101);
+            cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
+            cpu.a = 0b0000_1010;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Zero), true);
+            assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
+            assert_eq!(cpu.get_flag(&Flag::Negative), false);
+        }
+
+        #[test]
+        fn absolute_overflow() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b_0100_0101);
+            cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
+            cpu.a = 0b0000_0101;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Zero), false);
+            assert_eq!(cpu.get_flag(&Flag::OverFlow), true);
+            assert_eq!(cpu.get_flag(&Flag::Negative), false);
+        }
+
+        #[test]
+        fn absolute_negative() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b_1000_0101);
+            cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
+            cpu.a = 0b0000_0101;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Zero), false);
+            assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
+            assert_eq!(cpu.get_flag(&Flag::Negative), true);
+        }
     }
 }
