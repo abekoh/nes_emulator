@@ -1159,7 +1159,6 @@ mod tests {
 
     #[cfg(test)]
     mod bit {
-        use std::mem::transmute;
         use super::*;
 
         #[test]
@@ -1232,6 +1231,38 @@ mod tests {
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
             assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
             assert_eq!(cpu.get_flag(&Flag::Negative), true);
+        }
+    }
+
+    #[cfg(test)]
+    mod cmp {
+        use super::*;
+
+        #[test]
+        fn immediate_greater_than_param() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xc9, 0x11, 0x00]);
+            cpu.a = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn immediate_equal_with_param() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xc9, 0x22, 0x00]);
+            cpu.a = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn immediate_less_than_param() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xc9, 0x33, 0x00]);
+            cpu.a = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), false);
         }
     }
 }
