@@ -26,6 +26,7 @@ impl OpCode {
             AddressingMode::Absolute => 2,
             AddressingMode::Absolute_X => 2,
             AddressingMode::Absolute_Y => 2,
+            AddressingMode::Indirect => 1,
             AddressingMode::Indirect_X => 1,
             AddressingMode::Indirect_Y => 1,
         }
@@ -278,6 +279,7 @@ lazy_static! {
 
         // JMP
         OpCode::new(0x4c, Mnemonic::JMP, AddressingMode::Absolute),
+        OpCode::new(0x6c, Mnemonic::JMP, AddressingMode::Indirect),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

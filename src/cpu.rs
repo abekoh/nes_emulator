@@ -27,6 +27,7 @@ pub enum AddressingMode {
     Absolute,
     Absolute_X,
     Absolute_Y,
+    Indirect,
     Indirect_X,
     Indirect_Y,
     NoneAddressing,
@@ -221,6 +222,12 @@ impl CPU {
             AddressingMode::Absolute_Y => {
                 let pos = self.mem_read_u16(self.pc);
                 pos.wrapping_add(self.y as u16)
+            }
+            AddressingMode::Indirect => {
+                let ptr = self.mem_read(self.pc);
+                let lo = self.mem_read(ptr as u16);
+                let hi = self.mem_read(ptr.wrapping_add(1) as u16);
+                (hi as u16) << 8 | (lo as u16)
             }
             AddressingMode::Indirect_X => {
                 let base = self.mem_read(self.pc);
@@ -2132,9 +2139,9 @@ mod tests {
         #[test]
         fn indirect() {
             let mut cpu = CPU::new();
-            cpu.mem_write_u16(0x1122, 0x3344);
+            cpu.mem_write_u16(0x11, 0x3344);
             cpu.mem_write_u16(0x3344, 0x5566);
-            cpu.load_reset_run(vec![0x6c, 0x22, 0x11, 0x00]);
+            cpu.load_reset_run(vec![0x6c, 0x11, 0x00]);
             assert_eq!(cpu.pc, 0x5567);
         }
     }
