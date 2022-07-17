@@ -48,6 +48,7 @@ enum Register {
     X,
     Y,
     S,
+    P,
 }
 
 impl Flag {
@@ -240,6 +241,7 @@ impl CPU {
             Register::X => self.x,
             Register::Y => self.y,
             Register::S => self.sp,
+            Register::P => self.status,
         }
     }
 
@@ -249,6 +251,7 @@ impl CPU {
             Register::X => self.x = data,
             Register::Y => self.y = data,
             Register::S => self.sp = data,
+            Register::P => self.status = data,
         };
     }
 
