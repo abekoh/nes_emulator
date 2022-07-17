@@ -161,6 +161,7 @@ impl CPU {
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
+                Mnemonic::CPY => self.cmp(&Register::Y, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -1397,6 +1398,40 @@ mod tests {
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xec, 0x22, 0x11, 0x00]);
             cpu.x = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+    }
+
+    #[cfg(test)]
+    mod cpy {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xc0, 0x11, 0x00]);
+            cpu.y = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x11);
+            cpu.load_reset(vec![0xc4, 0x10, 0x00]);
+            cpu.y = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x11);
+            cpu.load_reset(vec![0xcc, 0x22, 0x11, 0x00]);
+            cpu.y = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
