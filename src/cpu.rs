@@ -184,6 +184,7 @@ impl CPU {
                 Mnemonic::INX => self.inc_reg(&Register::X),
                 Mnemonic::INY => self.inc_reg(&Register::Y),
                 Mnemonic::PHA => self.push(&Register::A),
+                Mnemonic::PHP => self.push(&Register::P),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -2065,6 +2066,17 @@ mod tests {
         cpu.load_reset(vec![0x48, 0x00]);
         cpu.reset();
         cpu.a = 0xaa;
+        cpu.run();
+        assert_eq!(cpu.mem_read(0x01ff), 0xaa);
+        assert_eq!(cpu.sp, 0xfe);
+    }
+
+    #[test]
+    fn php() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x08, 0x00]);
+        cpu.reset();
+        cpu.status = 0xaa;
         cpu.run();
         assert_eq!(cpu.mem_read(0x01ff), 0xaa);
         assert_eq!(cpu.sp, 0xfe);
