@@ -118,6 +118,13 @@ lazy_static! {
 
         // ADC
         OpCode::new(0x69, Mnemonic::ADC, AddressingMode::Immediate),
+        OpCode::new(0x65, Mnemonic::ADC, AddressingMode::ZeroPage),
+        OpCode::new(0x75, Mnemonic::ADC, AddressingMode::ZeroPage_X),
+        OpCode::new(0x6d, Mnemonic::ADC, AddressingMode::Absolute),
+        OpCode::new(0x7d, Mnemonic::ADC, AddressingMode::Absolute_X),
+        OpCode::new(0x79, Mnemonic::ADC, AddressingMode::Absolute_Y),
+        OpCode::new(0x61, Mnemonic::ADC, AddressingMode::Indirect_X),
+        OpCode::new(0x71, Mnemonic::ADC, AddressingMode::Indirect_Y),
 
         // SBC
         OpCode::new(0xe9, Mnemonic::SBC, AddressingMode::Immediate),
