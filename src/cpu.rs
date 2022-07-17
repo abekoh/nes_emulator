@@ -159,6 +159,7 @@ impl CPU {
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.asl(&opcode.mode),
                 Mnemonic::BIT => self.bit(&opcode.mode),
+                Mnemonic::CMP => self.cmp(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -304,6 +305,14 @@ impl CPU {
         self.update_zero_flag(self.a & mem_val);
         self.update_negative_flag(mem_val);
     }
+
+    fn cmp(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        self.set_flag(&Flag::Carry, self.a >= mem_val);
+        // TODO: z, n
+    }
+
 
     fn update_zero_flag(&mut self, result: u8) {
         self.set_flag(&Flag::Zero, result == 0);
