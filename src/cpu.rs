@@ -154,14 +154,14 @@ impl CPU {
                 Mnemonic::STA => self.st(&Register::A, &opcode.mode),
                 Mnemonic::STX => self.st(&Register::X, &opcode.mode),
                 Mnemonic::STY => self.st(&Register::Y, &opcode.mode),
-                Mnemonic::TAX => self.t(&Register::A, &Register::X),
-                Mnemonic::TAY => self.t(&Register::A, &Register::Y),
-                Mnemonic::TSX => self.t(&Register::S, &Register::X),
-                Mnemonic::TXA => self.t(&Register::X, &Register::A),
-                Mnemonic::TXS => self.t(&Register::X, &Register::S),
-                Mnemonic::TYA => self.t(&Register::Y, &Register::A),
-                Mnemonic::ADC => self.adc(&opcode.mode),
-                Mnemonic::SBC => self.sbc(&opcode.mode),
+                Mnemonic::TAX => self.copy(&Register::A, &Register::X),
+                Mnemonic::TAY => self.copy(&Register::A, &Register::Y),
+                Mnemonic::TSX => self.copy(&Register::S, &Register::X),
+                Mnemonic::TXA => self.copy(&Register::X, &Register::A),
+                Mnemonic::TXS => self.copy(&Register::X, &Register::S),
+                Mnemonic::TYA => self.copy(&Register::Y, &Register::A),
+                Mnemonic::ADC => self.add(&opcode.mode),
+                Mnemonic::SBC => self.sub(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.shift_left(&opcode.mode, false),
                 Mnemonic::LSR => self.shift_right(&opcode.mode, false),
@@ -177,8 +177,8 @@ impl CPU {
                 Mnemonic::DEY => self.dec_reg(&Register::Y),
                 Mnemonic::INX => self.inc_reg(&Register::X),
                 Mnemonic::INY => self.inc_reg(&Register::Y),
-                Mnemonic::EOR => self.eor(&opcode.mode),
-                Mnemonic::ORA => self.ora(&opcode.mode),
+                Mnemonic::EOR => self.exor(&opcode.mode),
+                Mnemonic::ORA => self.or(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -265,7 +265,7 @@ impl CPU {
         self.mem_write(addr, self.get_register(reg));
     }
 
-    fn t(&mut self, from: &Register, to: &Register) {
+    fn copy(&mut self, from: &Register, to: &Register) {
         let val = self.get_register(from);
         self.set_register_with_update_flags(to, val);
     }
@@ -280,13 +280,13 @@ impl CPU {
         self.set_register_with_update_flags(&Register::A, res);
     }
 
-    fn adc(&mut self, mode: &AddressingMode) {
+    fn add(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         self.add_to_a(mem_val);
     }
 
-    fn sbc(&mut self, mode: &AddressingMode) {
+    fn sub(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         self.add_to_a((mem_val as i8).wrapping_neg().wrapping_sub(1) as u8);
@@ -381,7 +381,7 @@ impl CPU {
         self.set_register_with_update_flags(reg, res);
     }
 
-    fn eor(&mut self, mode: &AddressingMode) {
+    fn exor(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let reg_val = self.get_register(&Register::A);
@@ -389,7 +389,7 @@ impl CPU {
         self.set_register_with_update_flags(&Register::A, res);
     }
 
-    fn ora(&mut self, mode: &AddressingMode) {
+    fn or(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let reg_val = self.get_register(&Register::A);
