@@ -185,6 +185,7 @@ impl CPU {
                 Mnemonic::INY => self.inc_reg(&Register::Y),
                 Mnemonic::PHA => self.push(&Register::A),
                 Mnemonic::PHP => self.push(&Register::P),
+                Mnemonic::PLA => self.pop(&Register::A),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -430,6 +431,13 @@ impl CPU {
         let addr = STACK_BEGIN + (self.sp as u16);
         self.mem_write(addr, reg_val);
         self.dec_sp();
+    }
+
+    fn pop(&mut self, reg: &Register) {
+        let addr = STACK_BEGIN + (self.sp as u16);
+        let val = self.mem_read(addr);
+        self.set_register(reg, val);
+        self.inc_sp();
     }
 
     fn dec_sp(&mut self) {
@@ -2068,5 +2076,16 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.mem_read(0x01ff), 0xaa);
         assert_eq!(cpu.sp, 0xfe);
+    }
+
+    #[test]
+    fn pla() {
+        let mut cpu = CPU::new();
+        cpu.mem_write(0x01bb, 0xaa);
+        cpu.load_reset(vec![0x68, 0x00]);
+        cpu.sp = 0xbb;
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+        assert_eq!(cpu.sp, 0xbc);
     }
 }

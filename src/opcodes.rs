@@ -66,6 +66,7 @@ pub enum Mnemonic {
     INY,
     PHA,
     PHP,
+    PLA,
     BRK,
 }
 
@@ -266,6 +267,9 @@ lazy_static! {
 
         // PHP
         OpCode::new(0x08, Mnemonic::PHP, AddressingMode::NoneAddressing),
+
+        // PLA
+        OpCode::new(0x68, Mnemonic::PLA, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
