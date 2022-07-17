@@ -14,6 +14,7 @@ pub struct CPU {
     pub status: u8,
     pub pc: u16,
     mem: [u8; 0xFFFF],
+    jumped: bool,
 }
 
 #[derive(Debug)]
@@ -91,6 +92,7 @@ impl CPU {
             status: 0,
             pc: 0,
             mem: [0; 0xFFFF],
+            jumped: false,
         }
     }
 
@@ -149,6 +151,7 @@ impl CPU {
         loop {
             let code = self.mem_read(self.pc);
             self.pc += 1;
+            self.jumped = false;
 
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
@@ -188,9 +191,12 @@ impl CPU {
                 Mnemonic::PHP => self.push(&Register::P),
                 Mnemonic::PLA => self.pop(&Register::A),
                 Mnemonic::PLP => self.pop(&Register::P),
+                Mnemonic::JMP => self.jmp(&opcode.mode),
                 Mnemonic::BRK => return,
             }
-            self.pc += opcode.pc_offset() as u16;
+            if !self.jumped {
+                self.pc += opcode.pc_offset() as u16;
+            }
         }
     }
 
@@ -452,6 +458,13 @@ impl CPU {
 
     fn inc_sp(&mut self) {
         self.sp = self.sp.wrapping_add(1);
+    }
+
+    fn jmp(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read_u16(addr);
+        self.pc = mem_val;
+        self.jumped = true;
     }
 }
 
@@ -2104,5 +2117,18 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.status, 0xaa);
         assert_eq!(cpu.sp, 0xbc);
+    }
+
+    #[cfg(test)]
+    mod jmp {
+        use super::*;
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write_u16(0x1122, 0x3344);
+            cpu.load_reset_run(vec![0x4c, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.pc, 0x3345);
+        }
     }
 }

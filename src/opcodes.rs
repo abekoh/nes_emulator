@@ -68,6 +68,7 @@ pub enum Mnemonic {
     PHP,
     PLA,
     PLP,
+    JMP,
     BRK,
 }
 
@@ -274,6 +275,9 @@ lazy_static! {
 
         // PLP
         OpCode::new(0x28, Mnemonic::PLP, AddressingMode::NoneAddressing),
+
+        // JMP
+        OpCode::new(0x4c, Mnemonic::JMP, AddressingMode::Absolute),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
