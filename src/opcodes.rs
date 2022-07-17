@@ -64,6 +64,7 @@ pub enum Mnemonic {
     DEY,
     INX,
     INY,
+    PHA,
     BRK,
 }
 
@@ -258,6 +259,9 @@ lazy_static! {
 
         // INY
         OpCode::new(0xc8, Mnemonic::INY, AddressingMode::NoneAddressing),
+
+        // PHA
+        OpCode::new(0x48, Mnemonic::PHA, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

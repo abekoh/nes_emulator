@@ -182,6 +182,7 @@ impl CPU {
                 Mnemonic::DEY => self.dec_reg(&Register::Y),
                 Mnemonic::INX => self.inc_reg(&Register::X),
                 Mnemonic::INY => self.inc_reg(&Register::Y),
+                Mnemonic::PHA => self.push(&Register::A),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -418,6 +419,21 @@ impl CPU {
         let reg_val = self.get_register(reg);
         let res = reg_val.wrapping_add(1);
         self.set_register_with_update_flags(reg, res);
+    }
+
+    fn push(&mut self, reg: &Register) {
+        let reg_val = self.get_register(reg);
+        let addr = STACK_BEGIN + (self.sp as u16);
+        self.mem_write(addr, reg_val);
+        self.dec_sp();
+    }
+
+    fn dec_sp(&mut self) {
+        self.sp = self.sp.wrapping_sub(1);
+    }
+
+    fn inc_sp(&mut self) {
+        self.sp = self.sp.wrapping_add(1);
     }
 }
 
