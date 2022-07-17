@@ -898,7 +898,7 @@ mod tests {
             cpu.mem_write(0x11, 0x11);
             cpu.load_reset(vec![0xf5, 0x10, 0x00]);
             cpu.reset();
-            cpu.a = 0x22;
+            cpu.a = 0x33;
             cpu.x = 0x01;
             cpu.run();
             assert_eq!(cpu.a, 0x21);

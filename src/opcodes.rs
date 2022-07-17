@@ -128,6 +128,13 @@ lazy_static! {
 
         // SBC
         OpCode::new(0xe9, Mnemonic::SBC, AddressingMode::Immediate),
+        OpCode::new(0xe5, Mnemonic::SBC, AddressingMode::ZeroPage),
+        OpCode::new(0xf5, Mnemonic::SBC, AddressingMode::ZeroPage_X),
+        OpCode::new(0xed, Mnemonic::SBC, AddressingMode::Absolute),
+        OpCode::new(0xfd, Mnemonic::SBC, AddressingMode::Absolute_X),
+        OpCode::new(0xf9, Mnemonic::SBC, AddressingMode::Absolute_Y),
+        OpCode::new(0xe1, Mnemonic::SBC, AddressingMode::Indirect_X),
+        OpCode::new(0xf1, Mnemonic::SBC, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
