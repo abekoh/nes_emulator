@@ -764,4 +764,30 @@ mod tests {
             assert_eq!(cpu.a, 0x34);
         }
     }
+
+    #[cfg(test)]
+    mod sbc {
+        use super::*;
+
+        #[test]
+        fn immediate_no_carry_flag() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xe9, 0x11, 0x00]);
+            cpu.a = 0x33;
+            cpu.run();
+            // 0x33 - 0x11 - 0x01 (reversed carry flag)
+            assert_eq!(cpu.a, 0x21);
+        }
+
+        #[test]
+        fn immediate_with_carry_flag() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xe9, 0x11, 0x00]);
+            cpu.a = 0x33;
+            cpu.set_flag(&Flag::Carry, true);
+            cpu.run();
+            // 0x33 - 0x11
+            assert_eq!(cpu.a, 0x22);
+        }
+    }
 }
