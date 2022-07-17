@@ -166,6 +166,7 @@ impl CPU {
                 Mnemonic::ASL => self.shift_left(&opcode.mode, false),
                 Mnemonic::LSR => self.shift_right(&opcode.mode, false),
                 Mnemonic::ROL => self.shift_left(&opcode.mode, true),
+                Mnemonic::ROR => self.shift_right(&opcode.mode, true),
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
@@ -322,38 +323,16 @@ impl CPU {
         match mode {
             AddressingMode::NoneAddressing => {
                 let reg_val = self.get_register(&Register::A);
-                let res = reg_val.wrapping_shr(1);
+                let res = reg_val.wrapping_shr(1).wrapping_add(carry_val);
                 self.set_register_with_update_flags(&Register::A, res);
                 self.set_flag(&Flag::Carry, reg_val & 0b0000_0001 != 0);
             }
             _ => {
                 let addr = self.get_operand_address(mode);
-                let mem_val = self.mem_read(addr);
+                let mem_val = self.mem_read(addr).wrapping_add(carry_val);
                 let res = mem_val.wrapping_shr(1);
                 self.mem_write_with_update_flags(addr, res);
                 self.set_flag(&Flag::Carry, mem_val & 0b0000_0001 != 0);
-            }
-        };
-    }
-
-    fn rol(&mut self, mode: &AddressingMode) {
-        match mode {
-            AddressingMode::NoneAddressing => {
-                let reg_val = self.get_register(&Register::A);
-                let (res, over) = reg_val.overflowing_shl(1);
-                let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
-                let res = res.wrapping_add(carry_val);
-                self.set_flag(&Flag::Carry, over);
-                self.set_register_with_update_flags(&Register::A, res);
-            }
-            _ => {
-                let addr = self.get_operand_address(mode);
-                let mem_val = self.mem_read(addr);
-                let (res, over) = mem_val.overflowing_shl(1);
-                let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
-                let res = res.wrapping_add(carry_val);
-                self.set_flag(&Flag::Carry, over);
-                self.mem_write_with_update_flags(addr, res);
             }
         };
     }
