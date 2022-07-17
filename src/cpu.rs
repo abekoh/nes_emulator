@@ -1892,7 +1892,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x55, 0x10, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x01;
             cpu.run();
@@ -1914,7 +1913,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x5d, 0x22, 0x11, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x11;
             cpu.run();
@@ -1926,7 +1924,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x59, 0x22, 0x11, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.y = 0x11;
             cpu.run();
@@ -1940,7 +1937,6 @@ mod tests {
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x41, 0x00, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x01;
             cpu.run();
@@ -1954,7 +1950,6 @@ mod tests {
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x51, 0x01, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.y = 0x01;
             cpu.run();
@@ -1990,7 +1985,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x15, 0x10, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x01;
             cpu.run();
@@ -2012,7 +2006,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x1d, 0x22, 0x11, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x11;
             cpu.run();
@@ -2024,7 +2017,6 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x19, 0x22, 0x11, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.y = 0x11;
             cpu.run();
@@ -2038,7 +2030,6 @@ mod tests {
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x01, 0x00, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.x = 0x01;
             cpu.run();
@@ -2052,7 +2043,6 @@ mod tests {
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x11, 0x01, 0x00]);
-            cpu.reset();
             cpu.a = 0b1100;
             cpu.y = 0x01;
             cpu.run();
@@ -2064,7 +2054,6 @@ mod tests {
     fn pha() {
         let mut cpu = CPU::new();
         cpu.load_reset(vec![0x48, 0x00]);
-        cpu.reset();
         cpu.a = 0xaa;
         cpu.run();
         assert_eq!(cpu.mem_read(0x01ff), 0xaa);
@@ -2075,7 +2064,6 @@ mod tests {
     fn php() {
         let mut cpu = CPU::new();
         cpu.load_reset(vec![0x08, 0x00]);
-        cpu.reset();
         cpu.status = 0xaa;
         cpu.run();
         assert_eq!(cpu.mem_read(0x01ff), 0xaa);
