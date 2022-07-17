@@ -1217,12 +1217,23 @@ mod tests {
         use super::*;
 
         #[test]
-        fn accumulator() {
+        fn accumulator_no_carry() {
             let mut cpu = CPU::new();
             cpu.load_reset(vec![0x0a, 0x00]);
             cpu.a = 0b0101;
             cpu.run();
             assert_eq!(cpu.a, 0b1010);
+            assert_eq!(cpu.get_flag(&Flag::Carry), false);
+        }
+
+        #[test]
+        fn accumulator_with_carry() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x0a, 0x00]);
+            cpu.a = 0b1010_1010;
+            cpu.run();
+            assert_eq!(cpu.a, 0b0101_0100);
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
 
         #[test]
