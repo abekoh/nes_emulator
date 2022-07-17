@@ -327,7 +327,7 @@ impl CPU {
     fn dec(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
-        let res = mem_val - 1;
+        let res = mem_val.wrapping_sub(1);
         self.mem_write(addr, res);
         self.update_zero_flag(res);
         self.update_negative_flag(res);
@@ -336,7 +336,7 @@ impl CPU {
     fn inc(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
-        let res = mem_val + 1;
+        let res = mem_val.wrapping_add(1);
         self.mem_write(addr, res);
         self.update_zero_flag(res);
         self.update_negative_flag(res);
@@ -344,7 +344,7 @@ impl CPU {
 
     fn de(&mut self, reg: &Register) {
         let reg_val = self.get_register(reg);
-        let res = reg_val - 1;
+        let res = reg_val.wrapping_sub(1);
         self.set_register_with_update_flags(reg, res);
     }
 
