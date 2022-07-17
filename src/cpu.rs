@@ -335,9 +335,7 @@ impl CPU {
     fn de(&mut self, reg: &Register) {
         let reg_val = self.get_register(reg);
         let res = reg_val - 1;
-        self.set_register(reg, res);
-        self.update_zero_flag(res);
-        self.update_negative_flag(res);
+        self.set_register_with_update_flags(reg, res);
     }
 
     fn eor(&mut self, mode: &AddressingMode) {
@@ -345,9 +343,7 @@ impl CPU {
         let mem_val = self.mem_read(addr);
         let reg_val = self.get_register(&Register::A);
         let res = reg_val ^ mem_val;
-        self.set_register(&Register::A, res);
-        self.update_zero_flag(res);
-        self.update_negative_flag(res);
+        self.set_register_with_update_flags(&Register::A, res);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
