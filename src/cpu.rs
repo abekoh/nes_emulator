@@ -2039,4 +2039,15 @@ mod tests {
             assert_eq!(cpu.a, 0b1101);
         }
     }
+
+    #[test]
+    fn pha() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x48, 0x00]);
+        cpu.reset();
+        cpu.a = 0xaa;
+        cpu.run();
+        assert_eq!(cpu.mem_read(0x01ff), 0xaa);
+        assert_eq!(cpu.sp, 0xfe);
+    }
 }
