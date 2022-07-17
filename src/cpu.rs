@@ -290,16 +290,6 @@ impl CPU {
         self.set_register_with_update_flags(to, val);
     }
 
-    fn add_to_a(&mut self, param: u8) {
-        let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
-        let reg_val = self.get_register(&Register::A);
-        let (res, over1) = reg_val.overflowing_add(param);
-        let (res, over2) = res.overflowing_add(carry_val);
-        self.set_flag(&Flag::Carry, over1 || over2);
-        self.set_flag(&Flag::OverFlow, (res ^ param) & (res ^ reg_val) & 0b1000_0000 != 0);
-        self.set_register_with_update_flags(&Register::A, res);
-    }
-
     fn add(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
@@ -312,11 +302,45 @@ impl CPU {
         self.add_to_a((mem_val as i8).wrapping_neg().wrapping_sub(1) as u8);
     }
 
+    fn add_to_a(&mut self, param: u8) {
+        let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
+        let reg_val = self.get_register(&Register::A);
+        let (res, over1) = reg_val.overflowing_add(param);
+        let (res, over2) = res.overflowing_add(carry_val);
+        self.set_flag(&Flag::Carry, over1 || over2);
+        self.set_flag(&Flag::OverFlow, (res ^ param) & (res ^ reg_val) & 0b1000_0000 != 0);
+        self.set_register_with_update_flags(&Register::A, res);
+    }
+
     fn and(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let val = self.a & mem_val;
         self.set_register_with_update_flags(&Register::A, val);
+    }
+
+    fn or(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let reg_val = self.get_register(&Register::A);
+        let res = reg_val | mem_val;
+        self.set_register_with_update_flags(&Register::A, res);
+    }
+
+    fn exor(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let reg_val = self.get_register(&Register::A);
+        let res = reg_val ^ mem_val;
+        self.set_register_with_update_flags(&Register::A, res);
+    }
+
+    fn bit(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        self.set_flag(&Flag::OverFlow, mem_val & 0b0100_0000 > 0);
+        self.update_zero_flag(self.a & mem_val);
+        self.update_negative_flag(mem_val);
     }
 
     fn shift_left(&mut self, mode: &AddressingMode, use_carry: bool) {
@@ -357,14 +381,6 @@ impl CPU {
         };
     }
 
-    fn bit(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read(addr);
-        self.set_flag(&Flag::OverFlow, mem_val & 0b0100_0000 > 0);
-        self.update_zero_flag(self.a & mem_val);
-        self.update_negative_flag(mem_val);
-    }
-
     fn cmp(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
@@ -399,22 +415,6 @@ impl CPU {
         let reg_val = self.get_register(reg);
         let res = reg_val.wrapping_add(1);
         self.set_register_with_update_flags(reg, res);
-    }
-
-    fn exor(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read(addr);
-        let reg_val = self.get_register(&Register::A);
-        let res = reg_val ^ mem_val;
-        self.set_register_with_update_flags(&Register::A, res);
-    }
-
-    fn or(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read(addr);
-        let reg_val = self.get_register(&Register::A);
-        let res = reg_val | mem_val;
-        self.set_register_with_update_flags(&Register::A, res);
     }
 }
 
