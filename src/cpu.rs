@@ -165,6 +165,7 @@ impl CPU {
                 Mnemonic::DEC => self.dec(&opcode.mode),
                 Mnemonic::DEX => self.de(&Register::X),
                 Mnemonic::DEY => self.de(&Register::Y),
+                Mnemonic::EOR => self.eor(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -334,6 +335,16 @@ impl CPU {
         let reg_val = self.get_register(reg);
         let res = reg_val - 1;
         self.set_register(reg, res);
+        self.update_zero_flag(res);
+        self.update_negative_flag(res);
+    }
+
+    fn eor(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let reg_val = self.get_register(&Register::A);
+        let res = reg_val ^ mem_val;
+        self.set_register(&Register::A, res);
         self.update_zero_flag(res);
         self.update_negative_flag(res);
     }
@@ -1513,5 +1524,19 @@ mod tests {
         cpu.y = 0x11;
         cpu.run();
         assert_eq!(cpu.y, 0x10)
+    }
+
+    #[cfg(test)]
+    mod eor {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x49, 0b0101, 0x00]);
+            cpu.a = 0b1100;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1001);
+        }
     }
 }

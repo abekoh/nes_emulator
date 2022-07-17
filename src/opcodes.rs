@@ -57,6 +57,7 @@ pub enum Mnemonic {
     DEC,
     DEX,
     DEY,
+    EOR,
 }
 
 lazy_static! {
@@ -197,6 +198,9 @@ lazy_static! {
 
         // DEY
         OpCode::new(0x88, Mnemonic::DEY, AddressingMode::NoneAddressing),
+
+        // EOR
+        OpCode::new(0x49, Mnemonic::EOR, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
