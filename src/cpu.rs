@@ -1281,5 +1281,89 @@ mod tests {
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
             assert_eq!(cpu.get_flag(&Flag::Negative), true);
         }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x11);
+            cpu.load_reset(vec![0xc5, 0x10, 0x00]);
+            cpu.a = 0x22;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0x11);
+            cpu.load_reset(vec![0xd5, 0x10, 0x00]);
+            cpu.a = 0x22;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x11);
+            cpu.load_reset(vec![0xcd, 0x22, 0x11, 0x00]);
+            cpu.a = 0x22;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x11);
+            cpu.load_reset(vec![0xdd, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0x22;
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn absolute_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x11);
+            cpu.load_reset(vec![0xd9, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.y = 0x22;
+            cpu.y = 0x11;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn indirect_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0705, 0x11);
+            cpu.mem_write(0x01, 0x05);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load_reset(vec![0xc1, 0x00, 0x00]);
+            cpu.reset();
+            cpu.a = 0x22;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn indirect_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0704, 0x11);
+            cpu.mem_write(0x01, 0x03);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load_reset(vec![0xd1, 0x01, 0x00]);
+            cpu.reset();
+            cpu.a = 0x22;
+            cpu.y = 0x01;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
     }
 }
