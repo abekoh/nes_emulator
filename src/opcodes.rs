@@ -55,6 +55,7 @@ pub enum Mnemonic {
     CPX,
     CPY,
     DEC,
+    INC,
     DEX,
     DEY,
     EOR,
@@ -192,6 +193,12 @@ lazy_static! {
         OpCode::new(0xd6, Mnemonic::DEC, AddressingMode::ZeroPage_X),
         OpCode::new(0xce, Mnemonic::DEC, AddressingMode::Absolute),
         OpCode::new(0xde, Mnemonic::DEC, AddressingMode::Absolute_X),
+
+        // INC
+        OpCode::new(0xe6, Mnemonic::INC, AddressingMode::ZeroPage),
+        OpCode::new(0xf6, Mnemonic::INC, AddressingMode::ZeroPage_X),
+        OpCode::new(0xee, Mnemonic::INC, AddressingMode::Absolute),
+        OpCode::new(0xfe, Mnemonic::INC, AddressingMode::Absolute_X),
 
         // DEX
         OpCode::new(0xca, Mnemonic::DEX, AddressingMode::NoneAddressing),

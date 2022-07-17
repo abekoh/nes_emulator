@@ -163,6 +163,7 @@ impl CPU {
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
                 Mnemonic::CPY => self.cmp(&Register::Y, &opcode.mode),
                 Mnemonic::DEC => self.dec(&opcode.mode),
+                Mnemonic::INC => self.inc(&opcode.mode),
                 Mnemonic::DEX => self.de(&Register::X),
                 Mnemonic::DEY => self.de(&Register::Y),
                 Mnemonic::EOR => self.eor(&opcode.mode),
@@ -327,6 +328,15 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let res = mem_val - 1;
+        self.mem_write(addr, res);
+        self.update_zero_flag(res);
+        self.update_negative_flag(res);
+    }
+
+    fn inc(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let res = mem_val + 1;
         self.mem_write(addr, res);
         self.update_zero_flag(res);
         self.update_negative_flag(res);
@@ -1502,6 +1512,47 @@ mod tests {
             cpu.x = 0x11;
             cpu.run();
             assert_eq!(cpu.mem_read(0x1133), 0x10);
+        }
+    }
+
+    #[cfg(test)]
+    mod inc {
+        use super::*;
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0x11);
+            cpu.load_reset_run(vec![0xe6, 0x10, 0x00]);
+            assert_eq!(cpu.mem_read(0x10), 0x12);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0x11);
+            cpu.load_reset(vec![0xf6, 0x10, 0x00]);
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x11), 0x12);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0x11);
+            cpu.load_reset_run(vec![0xee, 0x22, 0x11, 0x00]);
+            assert_eq!(cpu.mem_read(0x1122), 0x12);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0x11);
+            cpu.load_reset(vec![0xfe, 0x22, 0x11, 0x00]);
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1133), 0x12);
         }
     }
 
