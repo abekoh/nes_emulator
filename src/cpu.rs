@@ -1259,6 +1259,46 @@ mod tests {
             assert_eq!(cpu.a, 0b0010_1010);
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0b1010);
+            cpu.load_reset(vec![0x46, 0x10, 0x00]);
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x10), 0b0101);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0b1010);
+            cpu.load_reset(vec![0x56, 0x10, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x11), 0b0101);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b1010);
+            cpu.load_reset(vec![0x4e, 0x22, 0x11, 0x00]);
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1122), 0b0101);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0b1010);
+            cpu.load_reset(vec![0x5e, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1133), 0b0101);
+        }
     }
 
     #[cfg(test)]
