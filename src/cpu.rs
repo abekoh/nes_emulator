@@ -156,6 +156,7 @@ impl CPU {
                 Mnemonic::TYA => self.t(&Register::Y, &Register::A),
                 Mnemonic::ADC => self.adc(&opcode.mode),
                 Mnemonic::SBC => self.sbc(&opcode.mode),
+                Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -266,6 +267,15 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         self.add_to_a((mem_val as i8).wrapping_neg().wrapping_sub(1) as u8);
+    }
+
+    fn and(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let val = self.a & mem_val;
+        self.set_register(&Register::A, val);
+        self.update_zero_flag(val);
+        self.update_negative_flag(val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -964,6 +974,20 @@ mod tests {
             cpu.y = 0x01;
             cpu.run();
             assert_eq!(cpu.a, 0x21);
+        }
+    }
+
+    #[cfg(test)]
+    mod and {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x29, 0b0101, 0x00]);
+            cpu.a = 0b1100;
+            cpu.run();
+            assert_eq!(cpu.a, 0b0100);
         }
     }
 }

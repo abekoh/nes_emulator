@@ -48,6 +48,7 @@ pub enum Mnemonic {
     TYA,
     ADC,
     SBC,
+    AND,
 }
 
 lazy_static! {
@@ -135,6 +136,9 @@ lazy_static! {
         OpCode::new(0xf9, Mnemonic::SBC, AddressingMode::Absolute_Y),
         OpCode::new(0xe1, Mnemonic::SBC, AddressingMode::Indirect_X),
         OpCode::new(0xf1, Mnemonic::SBC, AddressingMode::Indirect_Y),
+
+        // AND
+        OpCode::new(0x29, Mnemonic::AND, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
