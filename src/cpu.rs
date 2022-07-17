@@ -453,24 +453,16 @@ impl CPU {
         }
     }
 
-    fn dec_sp(&mut self) {
-        self.sp = self.sp.wrapping_sub(1);
-    }
-
-    fn inc_sp(&mut self) {
-        self.sp = self.sp.wrapping_add(1);
-    }
-
     fn stack_push(&mut self, data: u8) {
         let addr = STACK_BEGIN + (self.sp as u16);
         self.mem_write(addr, data);
-        self.dec_sp();
+        self.sp = self.sp.wrapping_sub(1);
     }
 
     fn stack_pop(&mut self) -> u8 {
         let addr = STACK_BEGIN + (self.sp as u16);
         let val = self.mem_read(addr);
-        self.inc_sp();
+        self.sp = self.sp.wrapping_add(1);
         val
     }
 
