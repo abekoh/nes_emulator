@@ -33,7 +33,6 @@ impl OpCode {
 }
 
 pub enum Mnemonic {
-    BRK,
     LDA,
     LDX,
     LDY,
@@ -49,11 +48,13 @@ pub enum Mnemonic {
     ADC,
     SBC,
     AND,
+    ORA,
+    EOR,
+    BIT,
     ASL,
     LSR,
     ROL,
     ROR,
-    BIT,
     CMP,
     CPX,
     CPY,
@@ -63,8 +64,7 @@ pub enum Mnemonic {
     DEY,
     INX,
     INY,
-    EOR,
-    ORA,
+    BRK,
 }
 
 lazy_static! {
@@ -163,6 +163,30 @@ lazy_static! {
         OpCode::new(0x21, Mnemonic::AND, AddressingMode::Indirect_X),
         OpCode::new(0x31, Mnemonic::AND, AddressingMode::Indirect_Y),
 
+        // ORA
+        OpCode::new(0x09, Mnemonic::ORA, AddressingMode::Immediate),
+        OpCode::new(0x05, Mnemonic::ORA, AddressingMode::ZeroPage),
+        OpCode::new(0x15, Mnemonic::ORA, AddressingMode::ZeroPage_X),
+        OpCode::new(0x0d, Mnemonic::ORA, AddressingMode::Absolute),
+        OpCode::new(0x1d, Mnemonic::ORA, AddressingMode::Absolute_X),
+        OpCode::new(0x19, Mnemonic::ORA, AddressingMode::Absolute_Y),
+        OpCode::new(0x01, Mnemonic::ORA, AddressingMode::Indirect_X),
+        OpCode::new(0x11, Mnemonic::ORA, AddressingMode::Indirect_Y),
+
+        // EOR
+        OpCode::new(0x49, Mnemonic::EOR, AddressingMode::Immediate),
+        OpCode::new(0x45, Mnemonic::EOR, AddressingMode::ZeroPage),
+        OpCode::new(0x55, Mnemonic::EOR, AddressingMode::ZeroPage_X),
+        OpCode::new(0x4d, Mnemonic::EOR, AddressingMode::Absolute),
+        OpCode::new(0x5d, Mnemonic::EOR, AddressingMode::Absolute_X),
+        OpCode::new(0x59, Mnemonic::EOR, AddressingMode::Absolute_Y),
+        OpCode::new(0x41, Mnemonic::EOR, AddressingMode::Indirect_X),
+        OpCode::new(0x51, Mnemonic::EOR, AddressingMode::Indirect_Y),
+
+        // BIT
+        OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),
+        OpCode::new(0x2c, Mnemonic::BIT, AddressingMode::Absolute),
+
         // ASL
         OpCode::new(0x0a, Mnemonic::ASL, AddressingMode::NoneAddressing),
         OpCode::new(0x06, Mnemonic::ASL, AddressingMode::ZeroPage),
@@ -190,10 +214,6 @@ lazy_static! {
         OpCode::new(0x76, Mnemonic::ROR, AddressingMode::ZeroPage_X),
         OpCode::new(0x6e, Mnemonic::ROR, AddressingMode::Absolute),
         OpCode::new(0x7e, Mnemonic::ROR, AddressingMode::Absolute_X),
-
-        // BIT
-        OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),
-        OpCode::new(0x2c, Mnemonic::BIT, AddressingMode::Absolute),
 
         // CMP
         OpCode::new(0xc9, Mnemonic::CMP, AddressingMode::Immediate),
@@ -238,26 +258,6 @@ lazy_static! {
 
         // INY
         OpCode::new(0xc8, Mnemonic::INY, AddressingMode::NoneAddressing),
-
-        // EOR
-        OpCode::new(0x49, Mnemonic::EOR, AddressingMode::Immediate),
-        OpCode::new(0x45, Mnemonic::EOR, AddressingMode::ZeroPage),
-        OpCode::new(0x55, Mnemonic::EOR, AddressingMode::ZeroPage_X),
-        OpCode::new(0x4d, Mnemonic::EOR, AddressingMode::Absolute),
-        OpCode::new(0x5d, Mnemonic::EOR, AddressingMode::Absolute_X),
-        OpCode::new(0x59, Mnemonic::EOR, AddressingMode::Absolute_Y),
-        OpCode::new(0x41, Mnemonic::EOR, AddressingMode::Indirect_X),
-        OpCode::new(0x51, Mnemonic::EOR, AddressingMode::Indirect_Y),
-
-        // ORA
-        OpCode::new(0x09, Mnemonic::ORA, AddressingMode::Immediate),
-        OpCode::new(0x05, Mnemonic::ORA, AddressingMode::ZeroPage),
-        OpCode::new(0x15, Mnemonic::ORA, AddressingMode::ZeroPage_X),
-        OpCode::new(0x0d, Mnemonic::ORA, AddressingMode::Absolute),
-        OpCode::new(0x1d, Mnemonic::ORA, AddressingMode::Absolute_X),
-        OpCode::new(0x19, Mnemonic::ORA, AddressingMode::Absolute_Y),
-        OpCode::new(0x01, Mnemonic::ORA, AddressingMode::Indirect_X),
-        OpCode::new(0x11, Mnemonic::ORA, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
