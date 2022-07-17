@@ -1,8 +1,5 @@
 use std::collections::HashMap;
-use std::num::Wrapping;
-use std::ops::Add;
 
-use crate::cpu::IntType::{Negative, Positive};
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
 
@@ -31,7 +28,7 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, dead_code)]
 enum Flag {
     Carry,
     Zero,
@@ -247,17 +244,21 @@ impl CPU {
         self.update_negative_flag(val);
     }
 
-    fn adc(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read(addr);
+    fn add_to_a(&mut self, param: u8) {
         let carry_val: u8 = if self.get_flag(&Flag::Carry) { 1 } else { 0 };
-        let (res, over1) = self.a.overflowing_add(mem_val);
+        let (res, over1) = self.a.overflowing_add(param);
         let (res, over2) = res.overflowing_add(carry_val);
         self.set_flag(&Flag::Carry, over1 || over2);
-        self.set_flag(&Flag::OverFlow, (res ^ mem_val) & (res ^ self.a) & 0b1000_0000 != 0);
+        self.set_flag(&Flag::OverFlow, (res ^ param) & (res ^ self.a) & 0b1000_0000 != 0);
         self.a = res;
         self.update_zero_flag(res);
         self.update_negative_flag(res);
+    }
+
+    fn adc(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        self.add_to_a(mem_val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
