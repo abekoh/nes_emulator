@@ -70,6 +70,7 @@ pub enum Mnemonic {
     PLA,
     PLP,
     JMP,
+    JSR,
     BRK,
 }
 
@@ -280,6 +281,9 @@ lazy_static! {
         // JMP
         OpCode::new(0x4c, Mnemonic::JMP, AddressingMode::Absolute),
         OpCode::new(0x6c, Mnemonic::JMP, AddressingMode::Indirect),
+
+        // JSR
+        OpCode::new(0x20, Mnemonic::JSR, AddressingMode::Absolute),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

@@ -193,6 +193,7 @@ impl CPU {
                 Mnemonic::PLA => self.pop(&Register::A),
                 Mnemonic::PLP => self.pop(&Register::P),
                 Mnemonic::JMP => self.jmp(&opcode.mode),
+                Mnemonic::JSR => self.jsr(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -482,6 +483,14 @@ impl CPU {
     fn jmp(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read_u16(addr);
+        self.pc = mem_val;
+        self.jumped = true;
+    }
+
+    fn jsr(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read_u16(addr);
+        self.stack_push_u16(self.pc);
         self.pc = mem_val;
         self.jumped = true;
     }
