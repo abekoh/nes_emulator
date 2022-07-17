@@ -157,6 +157,7 @@ impl CPU {
                 Mnemonic::ADC => self.adc(&opcode.mode),
                 Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
+                Mnemonic::ASL => self.asl(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -274,6 +275,18 @@ impl CPU {
         let mem_val = self.mem_read(addr);
         let val = self.a & mem_val;
         self.set_register_with_update_flags(&Register::A, val);
+    }
+
+    fn asl(&mut self, mode: &AddressingMode) {
+        // TODO: addressing
+        match mode {
+            AddressingMode::NoneAddressing => {
+                let (res, over) = self.a.overflowing_shl(1);
+                self.set_flag(&Flag::Carry, over);
+                self.set_register_with_update_flags(&Register::A, res);
+            }
+            _ => todo!()
+        };
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -1070,6 +1083,20 @@ mod tests {
             cpu.y = 0x01;
             cpu.run();
             assert_eq!(cpu.a, 0b0100);
+        }
+    }
+
+    #[cfg(test)]
+    mod asl {
+        use super::*;
+
+        #[test]
+        fn accumulator() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x0a, 0x00]);
+            cpu.a = 0b0101;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1010);
         }
     }
 }
