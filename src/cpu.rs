@@ -159,7 +159,8 @@ impl CPU {
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.asl(&opcode.mode),
                 Mnemonic::BIT => self.bit(&opcode.mode),
-                Mnemonic::CMP => self.cmp(&opcode.mode),
+                Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
+                Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -306,11 +307,12 @@ impl CPU {
         self.update_negative_flag(mem_val);
     }
 
-    fn cmp(&mut self, mode: &AddressingMode) {
+    fn cmp(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
-        self.set_flag(&Flag::Carry, self.a >= mem_val);
-        let sub_val = self.a.wrapping_sub(mem_val);
+        let reg_val = self.get_register(reg);
+        self.set_flag(&Flag::Carry, reg_val >= mem_val);
+        let sub_val = reg_val.wrapping_sub(mem_val);
         self.update_zero_flag(sub_val);
         self.update_negative_flag(sub_val);
     }
@@ -1362,6 +1364,20 @@ mod tests {
             cpu.reset();
             cpu.a = 0x22;
             cpu.y = 0x01;
+            cpu.run();
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+    }
+
+    #[cfg(test)]
+    mod cpx {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0xe0, 0x11, 0x00]);
+            cpu.x = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }

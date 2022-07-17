@@ -52,6 +52,7 @@ pub enum Mnemonic {
     ASL,
     BIT,
     CMP,
+    CPX,
 }
 
 lazy_static! {
@@ -170,6 +171,9 @@ lazy_static! {
         OpCode::new(0xd9, Mnemonic::CMP, AddressingMode::Absolute_Y),
         OpCode::new(0xc1, Mnemonic::CMP, AddressingMode::Indirect_X),
         OpCode::new(0xd1, Mnemonic::CMP, AddressingMode::Indirect_Y),
+
+        // CPX
+        OpCode::new(0xe0, Mnemonic::CPX, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
