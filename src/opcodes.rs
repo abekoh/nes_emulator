@@ -139,6 +139,13 @@ lazy_static! {
 
         // AND
         OpCode::new(0x29, Mnemonic::AND, AddressingMode::Immediate),
+        OpCode::new(0x25, Mnemonic::AND, AddressingMode::ZeroPage),
+        OpCode::new(0x35, Mnemonic::AND, AddressingMode::ZeroPage_X),
+        OpCode::new(0x2d, Mnemonic::AND, AddressingMode::Absolute),
+        OpCode::new(0x3d, Mnemonic::AND, AddressingMode::Absolute_X),
+        OpCode::new(0x39, Mnemonic::AND, AddressingMode::Absolute_Y),
+        OpCode::new(0x21, Mnemonic::AND, AddressingMode::Indirect_X),
+        OpCode::new(0x31, Mnemonic::AND, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

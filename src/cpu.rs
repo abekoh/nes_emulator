@@ -992,7 +992,7 @@ mod tests {
         fn zeropage() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b0101);
-            cpu.load_reset(vec![0x29, 0x10, 0x00]);
+            cpu.load_reset(vec![0x25, 0x10, 0x00]);
             cpu.a = 0b1100;
             cpu.run();
             assert_eq!(cpu.a, 0b0100);
@@ -1014,7 +1014,7 @@ mod tests {
         fn absolute() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x1122, 0b0101);
-            cpu.load_reset(vec![0xed, 0x22, 0x11, 0x00]);
+            cpu.load_reset(vec![0x2d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
             cpu.run();
             assert_eq!(cpu.a, 0b0100);
