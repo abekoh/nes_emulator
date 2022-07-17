@@ -254,6 +254,26 @@ impl CPU {
         self.update_negative_flag(data);
     }
 
+    fn get_flag(&self, flag: &Flag) -> bool {
+        (self.status & flag.place()) > 0
+    }
+
+    fn set_flag(&mut self, flag: &Flag, val: bool) {
+        if val {
+            self.status = self.status | flag.place();
+        } else {
+            self.status = self.status & !flag.place();
+        }
+    }
+
+    fn update_zero_flag(&mut self, result: u8) {
+        self.set_flag(&Flag::Zero, result == 0);
+    }
+
+    fn update_negative_flag(&mut self, result: u8) {
+        self.set_flag(&Flag::Negative, int_type(result) == IntType::Negative);
+    }
+
     fn ld(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let val = self.mem_read(addr);
@@ -395,26 +415,6 @@ impl CPU {
         let reg_val = self.get_register(&Register::A);
         let res = reg_val | mem_val;
         self.set_register_with_update_flags(&Register::A, res);
-    }
-
-    fn update_zero_flag(&mut self, result: u8) {
-        self.set_flag(&Flag::Zero, result == 0);
-    }
-
-    fn update_negative_flag(&mut self, result: u8) {
-        self.set_flag(&Flag::Negative, int_type(result) == IntType::Negative);
-    }
-
-    fn get_flag(&self, flag: &Flag) -> bool {
-        (self.status & flag.place()) > 0
-    }
-
-    fn set_flag(&mut self, flag: &Flag, val: bool) {
-        if val {
-            self.status = self.status | flag.place();
-        } else {
-            self.status = self.status & !flag.place();
-        }
     }
 }
 
