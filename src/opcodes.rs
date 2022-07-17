@@ -169,6 +169,10 @@ lazy_static! {
 
         // LSR
         OpCode::new(0x4a, Mnemonic::LSR, AddressingMode::NoneAddressing),
+        OpCode::new(0x46, Mnemonic::LSR, AddressingMode::ZeroPage),
+        OpCode::new(0x56, Mnemonic::LSR, AddressingMode::ZeroPage_X),
+        OpCode::new(0x4e, Mnemonic::LSR, AddressingMode::Absolute),
+        OpCode::new(0x5e, Mnemonic::LSR, AddressingMode::Absolute_X),
 
         // BIT
         OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),

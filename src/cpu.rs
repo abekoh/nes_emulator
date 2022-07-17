@@ -317,17 +317,16 @@ impl CPU {
         match mode {
             AddressingMode::NoneAddressing => {
                 let reg_val = self.get_register(&Register::A);
-                self.set_flag(&Flag::Carry, reg_val & 0b0000_0001 != 0);
                 let res = reg_val.wrapping_shr(1);
                 self.set_register_with_update_flags(&Register::A, res);
+                self.set_flag(&Flag::Carry, reg_val & 0b0000_0001 != 0);
             }
             _ => {
-                todo!();
-                // let addr = self.get_operand_address(mode);
-                // let mem_val = self.mem_read(addr);
-                // let (res, over) = mem_val.overflowing_shl(1);
-                // self.set_flag(&Flag::Carry, over);
-                // self.mem_write_with_update_flags(addr, res);
+                let addr = self.get_operand_address(mode);
+                let mem_val = self.mem_read(addr);
+                let res = mem_val.wrapping_shr(1);
+                self.mem_write_with_update_flags(addr, res);
+                self.set_flag(&Flag::Carry, mem_val & 0b0000_0001 != 0);
             }
         };
     }
