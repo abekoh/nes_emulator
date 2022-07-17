@@ -3,6 +3,9 @@ use std::collections::HashMap;
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
 
+const STACK_BEGIN: u16 = 0x0100;
+const SP_BEGIN: u8 = 0xff;
+
 pub struct CPU {
     pub a: u8,
     pub x: u8,
@@ -82,7 +85,7 @@ impl CPU {
             a: 0,
             x: 0,
             y: 0,
-            sp: 0,
+            sp: SP_BEGIN,
             status: 0,
             pc: 0,
             mem: [0; 0xFFFF],
