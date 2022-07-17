@@ -1310,6 +1310,72 @@ mod tests {
     }
 
     #[cfg(test)]
+    mod rol {
+        use super::*;
+
+        #[test]
+        fn accumulator_has_no_carry_set_carry() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x2a, 0x00]);
+            cpu.a = 0b1010_1010;
+            cpu.run();
+            assert_eq!(cpu.a, 0b0101_0100);
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+
+        #[test]
+        fn accumulator_has_carry_unset_carry() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x2a, 0x00]);
+            cpu.a = 0b0010_1010;
+            cpu.set_flag(&Flag::Carry, true);
+            cpu.run();
+            assert_eq!(cpu.a, 0b0101_0101);
+            assert_eq!(cpu.get_flag(&Flag::Carry), false);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0b0101);
+            cpu.load_reset(vec![0x26, 0x10, 0x00]);
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x10), 0b1010);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0b0101);
+            cpu.load_reset(vec![0x36, 0x10, 0x00]);
+            cpu.reset();
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x11), 0b1010);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b0101);
+            cpu.load_reset(vec![0x2e, 0x22, 0x11, 0x00]);
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1122), 0b1010);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0b0101);
+            cpu.load_reset(vec![0x3e, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.mem_read(0x1133), 0b1010);
+        }
+    }
+
+    #[cfg(test)]
     mod bit {
         use super::*;
 
