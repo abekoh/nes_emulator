@@ -441,20 +441,16 @@ impl CPU {
 
     fn push(&mut self, reg: &Register) {
         let reg_val = self.get_register(reg);
-        let addr = STACK_BEGIN + (self.sp as u16);
-        self.mem_write(addr, reg_val);
-        self.dec_sp();
+        self.stack_push(reg_val);
     }
 
     fn pop(&mut self, reg: &Register) {
-        let addr = STACK_BEGIN + (self.sp as u16);
-        let val = self.mem_read(addr);
+        let val = self.stack_pop();
         self.set_register(reg, val);
         if *reg == Register::A {
             self.update_zero_flag(val);
             self.update_negative_flag(val);
         }
-        self.inc_sp();
     }
 
     fn dec_sp(&mut self) {
@@ -463,6 +459,19 @@ impl CPU {
 
     fn inc_sp(&mut self) {
         self.sp = self.sp.wrapping_add(1);
+    }
+
+    fn stack_push(&mut self, data: u8) {
+        let addr = STACK_BEGIN + (self.sp as u16);
+        self.mem_write(addr, data);
+        self.dec_sp();
+    }
+
+    fn stack_pop(&mut self) -> u8 {
+        let addr = STACK_BEGIN + (self.sp as u16);
+        let val = self.mem_read(addr);
+        self.inc_sp();
+        val
     }
 
     fn jmp(&mut self, mode: &AddressingMode) {
