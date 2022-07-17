@@ -1237,6 +1237,33 @@ mod tests {
     }
 
     #[cfg(test)]
+    mod lsr {
+        use crate::cpu::Flag::Carry;
+
+        use super::*;
+
+        #[test]
+        fn accumulator_no_carry() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x4a, 0x00]);
+            cpu.a = 0b1010_1010;
+            cpu.run();
+            assert_eq!(cpu.a, 0b0101_0101);
+            assert_eq!(cpu.get_flag(&Flag::Carry), false);
+        }
+
+        #[test]
+        fn accumulator_with_carry() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x4a, 0x00]);
+            cpu.a = 0b0101_0101;
+            cpu.run();
+            assert_eq!(cpu.a, 0b0010_1010);
+            assert_eq!(cpu.get_flag(&Flag::Carry), true);
+        }
+    }
+
+    #[cfg(test)]
     mod bit {
         use super::*;
 
@@ -1715,33 +1742,6 @@ mod tests {
             cpu.y = 0x01;
             cpu.run();
             assert_eq!(cpu.a, 0b1001);
-        }
-    }
-
-    #[cfg(test)]
-    mod lsr {
-        use crate::cpu::Flag::Carry;
-
-        use super::*;
-
-        #[test]
-        fn accumulator_no_carry() {
-            let mut cpu = CPU::new();
-            cpu.load_reset(vec![0x4a, 0x00]);
-            cpu.a = 0b1010_1010;
-            cpu.run();
-            assert_eq!(cpu.a, 0b0101_0101);
-            assert_eq!(cpu.get_flag(&Flag::Carry), false);
-        }
-
-        #[test]
-        fn accumulator_with_carry() {
-            let mut cpu = CPU::new();
-            cpu.load_reset(vec![0x4a, 0x00]);
-            cpu.a = 0b0101_0101;
-            cpu.run();
-            assert_eq!(cpu.a, 0b0010_1010);
-            assert_eq!(cpu.get_flag(&Flag::Carry), true);
         }
     }
 }
