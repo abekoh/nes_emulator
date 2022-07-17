@@ -163,11 +163,13 @@ impl CPU {
                 Mnemonic::ADC => self.add(&opcode.mode),
                 Mnemonic::SBC => self.sub(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
+                Mnemonic::ORA => self.or(&opcode.mode),
+                Mnemonic::EOR => self.exor(&opcode.mode),
+                Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::ASL => self.shift_left(&opcode.mode, false),
                 Mnemonic::LSR => self.shift_right(&opcode.mode, false),
                 Mnemonic::ROL => self.shift_left(&opcode.mode, true),
                 Mnemonic::ROR => self.shift_right(&opcode.mode, true),
-                Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::CMP => self.cmp(&Register::A, &opcode.mode),
                 Mnemonic::CPX => self.cmp(&Register::X, &opcode.mode),
                 Mnemonic::CPY => self.cmp(&Register::Y, &opcode.mode),
@@ -177,8 +179,6 @@ impl CPU {
                 Mnemonic::DEY => self.dec_reg(&Register::Y),
                 Mnemonic::INX => self.inc_reg(&Register::X),
                 Mnemonic::INY => self.inc_reg(&Register::Y),
-                Mnemonic::EOR => self.exor(&opcode.mode),
-                Mnemonic::ORA => self.or(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
