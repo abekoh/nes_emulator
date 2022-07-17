@@ -33,6 +33,24 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
+impl AddressingMode {
+    fn pc_offset(&self) -> u16 {
+        match self {
+            AddressingMode::NoneAddressing => 0,
+            AddressingMode::Immediate => 1,
+            AddressingMode::ZeroPage => 1,
+            AddressingMode::ZeroPage_X => 1,
+            AddressingMode::ZeroPage_Y => 1,
+            AddressingMode::Absolute => 2,
+            AddressingMode::Absolute_X => 2,
+            AddressingMode::Absolute_Y => 2,
+            AddressingMode::Indirect => 1,
+            AddressingMode::Indirect_X => 1,
+            AddressingMode::Indirect_Y => 1,
+        }
+    }
+}
+
 #[allow(non_camel_case_types, dead_code)]
 enum Flag {
     Carry,
@@ -197,7 +215,7 @@ impl CPU {
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
-                self.pc += opcode.pc_offset() as u16;
+                self.pc += opcode.mode.pc_offset();
             }
         }
     }

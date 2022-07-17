@@ -16,21 +16,6 @@ impl OpCode {
             mode,
         }
     }
-    pub fn pc_offset(&self) -> u8 {
-        match self.mode {
-            AddressingMode::NoneAddressing => 0,
-            AddressingMode::Immediate => 1,
-            AddressingMode::ZeroPage => 1,
-            AddressingMode::ZeroPage_X => 1,
-            AddressingMode::ZeroPage_Y => 1,
-            AddressingMode::Absolute => 2,
-            AddressingMode::Absolute_X => 2,
-            AddressingMode::Absolute_Y => 2,
-            AddressingMode::Indirect => 1,
-            AddressingMode::Indirect_X => 1,
-            AddressingMode::Indirect_Y => 1,
-        }
-    }
 }
 
 pub enum Mnemonic {
