@@ -212,6 +212,7 @@ impl CPU {
                 Mnemonic::PLP => self.pop(&Register::P),
                 Mnemonic::JMP => self.jmp(&opcode.mode),
                 Mnemonic::JSR => self.jsr(&opcode.mode),
+                Mnemonic::RTS => self.rts(),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -479,9 +480,9 @@ impl CPU {
     }
 
     fn stack_pop(&mut self) -> u8 {
+        self.sp = self.sp.wrapping_add(1);
         let addr = STACK_BEGIN + (self.sp as u16);
         let val = self.mem_read(addr);
-        self.sp = self.sp.wrapping_add(1);
         val
     }
 
@@ -492,9 +493,9 @@ impl CPU {
     }
 
     fn stack_pop_u16(&mut self) -> u16 {
+        self.sp = self.sp.wrapping_add(2);
         let addr = STACK_BEGIN + (self.sp as u16);
         let val = self.mem_read_u16(addr);
-        self.sp = self.sp.wrapping_add(2);
         val
     }
 
@@ -510,6 +511,12 @@ impl CPU {
         let mem_val = self.mem_read_u16(addr);
         self.stack_push_u16(self.pc + (mode.pc_offset() - 1));
         self.pc = mem_val;
+        self.jumped = true;
+    }
+
+    fn rts(&mut self) {
+        let addr = self.stack_pop_u16();
+        self.pc = addr;
         self.jumped = true;
     }
 }
