@@ -310,7 +310,9 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         self.set_flag(&Flag::Carry, self.a >= mem_val);
-        // TODO: z, n
+        let sub_val = self.a.wrapping_sub(mem_val);
+        self.update_zero_flag(sub_val);
+        self.update_negative_flag(sub_val);
     }
 
 
@@ -1254,6 +1256,8 @@ mod tests {
             cpu.a = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
+            assert_eq!(cpu.get_flag(&Flag::Zero), false);
+            assert_eq!(cpu.get_flag(&Flag::Negative), false);
         }
 
         #[test]
@@ -1263,6 +1267,8 @@ mod tests {
             cpu.a = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
+            assert_eq!(cpu.get_flag(&Flag::Zero), true);
+            assert_eq!(cpu.get_flag(&Flag::Negative), false);
         }
 
         #[test]
@@ -1272,6 +1278,8 @@ mod tests {
             cpu.a = 0x22;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), false);
+            assert_eq!(cpu.get_flag(&Flag::Zero), false);
+            assert_eq!(cpu.get_flag(&Flag::Negative), true);
         }
     }
 }
