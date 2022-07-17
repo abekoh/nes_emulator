@@ -1781,4 +1781,102 @@ mod tests {
             assert_eq!(cpu.a, 0b1001);
         }
     }
+
+    #[cfg(test)]
+    mod ora {
+        use super::*;
+
+        #[test]
+        fn immediate() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x09, 0b0101, 0x00]);
+            cpu.a = 0b1100;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn zeropage() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x10, 0b0101);
+            cpu.load_reset(vec![0x05, 0x10, 0x00]);
+            cpu.a = 0b1100;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn zeropage_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x11, 0b0101);
+            cpu.load_reset(vec![0x15, 0x10, 0x00]);
+            cpu.reset();
+            cpu.a = 0b1100;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn absolute() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1122, 0b0101);
+            cpu.load_reset(vec![0x0d, 0x22, 0x11, 0x00]);
+            cpu.a = 0b1100;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn absolute_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0b0101);
+            cpu.load_reset(vec![0x1d, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0b1100;
+            cpu.x = 0x11;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn absolute_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x1133, 0b0101);
+            cpu.load_reset(vec![0x19, 0x22, 0x11, 0x00]);
+            cpu.reset();
+            cpu.a = 0b1100;
+            cpu.y = 0x11;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn indirect_x() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0705, 0b0101);
+            cpu.mem_write(0x01, 0x05);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load_reset(vec![0x01, 0x00, 0x00]);
+            cpu.reset();
+            cpu.a = 0b1100;
+            cpu.x = 0x01;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+
+        #[test]
+        fn indirect_y() {
+            let mut cpu = CPU::new();
+            cpu.mem_write(0x0704, 0b0101);
+            cpu.mem_write(0x01, 0x03);
+            cpu.mem_write(0x02, 0x07);
+            cpu.load_reset(vec![0x11, 0x01, 0x00]);
+            cpu.reset();
+            cpu.a = 0b1100;
+            cpu.y = 0x01;
+            cpu.run();
+            assert_eq!(cpu.a, 0b1101);
+        }
+    }
 }
