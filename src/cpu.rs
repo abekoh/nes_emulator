@@ -466,6 +466,19 @@ impl CPU {
         val
     }
 
+    fn stack_push_u16(&mut self, data: u16) {
+        let addr = STACK_BEGIN + (self.sp as u16);
+        self.mem_write_u16(addr, data);
+        self.sp = self.sp.wrapping_sub(2);
+    }
+
+    fn stack_pop_u16(&mut self) -> u16 {
+        let addr = STACK_BEGIN + (self.sp as u16);
+        let val = self.mem_read_u16(addr);
+        self.sp = self.sp.wrapping_add(2);
+        val
+    }
+
     fn jmp(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read_u16(addr);
