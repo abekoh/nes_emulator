@@ -1332,7 +1332,7 @@ mod tests {
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xd9, 0x22, 0x11, 0x00]);
             cpu.reset();
-            cpu.y = 0x22;
+            cpu.a = 0x22;
             cpu.y = 0x11;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Carry), true);
