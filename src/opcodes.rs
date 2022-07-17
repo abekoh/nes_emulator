@@ -50,6 +50,7 @@ pub enum Mnemonic {
     SBC,
     AND,
     ASL,
+    BIT,
 }
 
 lazy_static! {
@@ -154,6 +155,9 @@ lazy_static! {
         OpCode::new(0x16, Mnemonic::ASL, AddressingMode::ZeroPage_X),
         OpCode::new(0x0e, Mnemonic::ASL, AddressingMode::Absolute),
         OpCode::new(0x1e, Mnemonic::ASL, AddressingMode::Absolute_X),
+
+        // BIT
+        OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

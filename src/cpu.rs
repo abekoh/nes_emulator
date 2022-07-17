@@ -158,6 +158,7 @@ impl CPU {
                 Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ASL => self.asl(&opcode.mode),
+                Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -294,6 +295,14 @@ impl CPU {
                 self.update_negative_flag(res);
             }
         };
+    }
+
+    fn bit(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        self.set_flag(&Flag::OverFlow, mem_val & 0b0100_0000 > 0);
+        self.update_zero_flag(self.a & mem_val);
+        self.update_negative_flag(mem_val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
@@ -1170,7 +1179,7 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b_0100_0101);
             cpu.load_reset(vec![0x24, 0x10, 0x00]);
-            cpu.a = 0b0000_1010;
+            cpu.a = 0b0000_0101;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
             assert_eq!(cpu.get_flag(&Flag::OverFlow), true);
@@ -1182,7 +1191,7 @@ mod tests {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b_1000_0101);
             cpu.load_reset(vec![0x24, 0x10, 0x00]);
-            cpu.a = 0b0000_1010;
+            cpu.a = 0b0000_0101;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
             assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
