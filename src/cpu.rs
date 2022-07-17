@@ -164,7 +164,7 @@ impl CPU {
                 Mnemonic::SBC => self.sub(&opcode.mode),
                 Mnemonic::AND => self.and(&opcode.mode),
                 Mnemonic::ORA => self.or(&opcode.mode),
-                Mnemonic::EOR => self.exor(&opcode.mode),
+                Mnemonic::EOR => self.exclusive_or(&opcode.mode),
                 Mnemonic::BIT => self.bit(&opcode.mode),
                 Mnemonic::ASL => self.shift_left(&opcode.mode, false),
                 Mnemonic::LSR => self.shift_right(&opcode.mode, false),
@@ -327,7 +327,7 @@ impl CPU {
         self.set_register_with_update_flags(&Register::A, res);
     }
 
-    fn exor(&mut self, mode: &AddressingMode) {
+    fn exclusive_or(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let reg_val = self.get_register(&Register::A);
