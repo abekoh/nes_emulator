@@ -155,6 +155,7 @@ impl CPU {
                 Mnemonic::TXS => self.t(&Register::X, &Register::S),
                 Mnemonic::TYA => self.t(&Register::Y, &Register::A),
                 Mnemonic::ADC => self.adc(&opcode.mode),
+                Mnemonic::SBC => self.sbc(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -259,6 +260,12 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         self.add_to_a(mem_val);
+    }
+
+    fn sbc(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        self.add_to_a((mem_val as i8).wrapping_neg().wrapping_sub(1) as u8);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
