@@ -51,6 +51,7 @@ pub enum Mnemonic {
     AND,
     ASL,
     LSR,
+    ROL,
     BIT,
     CMP,
     CPX,
@@ -174,6 +175,13 @@ lazy_static! {
         OpCode::new(0x56, Mnemonic::LSR, AddressingMode::ZeroPage_X),
         OpCode::new(0x4e, Mnemonic::LSR, AddressingMode::Absolute),
         OpCode::new(0x5e, Mnemonic::LSR, AddressingMode::Absolute_X),
+
+        // ROL
+        OpCode::new(0x2a, Mnemonic::ROL, AddressingMode::NoneAddressing),
+        OpCode::new(0x26, Mnemonic::ROL, AddressingMode::ZeroPage),
+        OpCode::new(0x36, Mnemonic::ROL, AddressingMode::ZeroPage_X),
+        OpCode::new(0x2e, Mnemonic::ROL, AddressingMode::Absolute),
+        OpCode::new(0x3e, Mnemonic::ROL, AddressingMode::Absolute_X),
 
         // BIT
         OpCode::new(0x24, Mnemonic::BIT, AddressingMode::ZeroPage),
