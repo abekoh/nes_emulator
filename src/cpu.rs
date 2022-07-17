@@ -176,6 +176,7 @@ impl CPU {
                 Mnemonic::INX => self.inc_reg(&Register::X),
                 Mnemonic::INY => self.inc_reg(&Register::Y),
                 Mnemonic::EOR => self.eor(&opcode.mode),
+                Mnemonic::ORA => self.ora(&opcode.mode),
                 Mnemonic::BRK => return,
             }
             self.pc += opcode.pc_offset() as u16;
@@ -380,6 +381,14 @@ impl CPU {
         let mem_val = self.mem_read(addr);
         let reg_val = self.get_register(&Register::A);
         let res = reg_val ^ mem_val;
+        self.set_register_with_update_flags(&Register::A, res);
+    }
+
+    fn ora(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let mem_val = self.mem_read(addr);
+        let reg_val = self.get_register(&Register::A);
+        let res = reg_val | mem_val;
         self.set_register_with_update_flags(&Register::A, res);
     }
 

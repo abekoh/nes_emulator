@@ -62,6 +62,7 @@ pub enum Mnemonic {
     INX,
     INY,
     EOR,
+    ORA,
 }
 
 lazy_static! {
@@ -231,6 +232,16 @@ lazy_static! {
         OpCode::new(0x59, Mnemonic::EOR, AddressingMode::Absolute_Y),
         OpCode::new(0x41, Mnemonic::EOR, AddressingMode::Indirect_X),
         OpCode::new(0x51, Mnemonic::EOR, AddressingMode::Indirect_Y),
+
+        // ORA
+        OpCode::new(0x09, Mnemonic::ORA, AddressingMode::Immediate),
+        OpCode::new(0x05, Mnemonic::ORA, AddressingMode::ZeroPage),
+        OpCode::new(0x15, Mnemonic::ORA, AddressingMode::ZeroPage_X),
+        OpCode::new(0x0d, Mnemonic::ORA, AddressingMode::Absolute),
+        OpCode::new(0x1d, Mnemonic::ORA, AddressingMode::Absolute_X),
+        OpCode::new(0x19, Mnemonic::ORA, AddressingMode::Absolute_Y),
+        OpCode::new(0x01, Mnemonic::ORA, AddressingMode::Indirect_X),
+        OpCode::new(0x11, Mnemonic::ORA, AddressingMode::Indirect_Y),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
