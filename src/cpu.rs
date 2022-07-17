@@ -1238,8 +1238,6 @@ mod tests {
 
     #[cfg(test)]
     mod lsr {
-        use crate::cpu::Flag::Carry;
-
         use super::*;
 
         #[test]
