@@ -1157,7 +1157,7 @@ mod tests {
         fn zeropage_zero() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b_0000_0101);
-            cpu.load_reset(vec![0x44, 0x10, 0x00]);
+            cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_1010;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Zero), true);
@@ -1169,7 +1169,7 @@ mod tests {
         fn zeropage_overflow() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b_0100_0101);
-            cpu.load_reset(vec![0x44, 0x10, 0x00]);
+            cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_1010;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
@@ -1181,7 +1181,7 @@ mod tests {
         fn zeropage_negative() {
             let mut cpu = CPU::new();
             cpu.mem_write(0x10, 0b_1000_0101);
-            cpu.load_reset(vec![0x44, 0x10, 0x00]);
+            cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_1010;
             cpu.run();
             assert_eq!(cpu.get_flag(&Flag::Zero), false);
