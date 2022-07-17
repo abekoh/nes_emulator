@@ -226,12 +226,16 @@ impl CPU {
         };
     }
 
+    fn set_register_with_update_flags(&mut self, reg: &Register, data: u8) {
+        self.set_register(reg, data);
+        self.update_zero_flag(data);
+        self.update_negative_flag(data);
+    }
+
     fn ld(&mut self, reg: &Register, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
         let val = self.mem_read(addr);
-        self.set_register(reg, val);
-        self.update_zero_flag(val);
-        self.update_negative_flag(val);
+        self.set_register_with_update_flags(reg, val);
     }
 
     fn st(&mut self, reg: &Register, mode: &AddressingMode) {
@@ -241,9 +245,7 @@ impl CPU {
 
     fn t(&mut self, from: &Register, to: &Register) {
         let val = self.get_register(from);
-        self.set_register(to, val);
-        self.update_zero_flag(val);
-        self.update_negative_flag(val);
+        self.set_register_with_update_flags(to, val);
     }
 
     fn add_to_a(&mut self, param: u8) {
@@ -252,9 +254,7 @@ impl CPU {
         let (res, over2) = res.overflowing_add(carry_val);
         self.set_flag(&Flag::Carry, over1 || over2);
         self.set_flag(&Flag::OverFlow, (res ^ param) & (res ^ self.a) & 0b1000_0000 != 0);
-        self.set_register(&Register::A, res);
-        self.update_zero_flag(res);
-        self.update_negative_flag(res);
+        self.set_register_with_update_flags(&Register::A, res);
     }
 
     fn adc(&mut self, mode: &AddressingMode) {
@@ -273,9 +273,7 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let mem_val = self.mem_read(addr);
         let val = self.a & mem_val;
-        self.set_register(&Register::A, val);
-        self.update_zero_flag(val);
-        self.update_negative_flag(val);
+        self.set_register_with_update_flags(&Register::A, val);
     }
 
     fn update_zero_flag(&mut self, result: u8) {
