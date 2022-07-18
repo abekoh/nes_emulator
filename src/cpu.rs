@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
 
-const PROGRAM_BEGIN: u16 = 0x8000;
+const PROGRAM_BEGIN: u16 = 0x0600;
 const STACK_BEGIN: u16 = 0x0100;
 const SP_BEGIN: u8 = 0xff;
 const PC_BEGIN: u16 = 0xfffc;
@@ -2256,7 +2256,7 @@ mod tests {
         cpu.mem_write_u16(0x1122, 0x3344);
         cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0x00]);
         assert_eq!(cpu.pc, 0x3345);
-        assert_eq!(cpu.mem_read_u16(0x01ff), 0x8002);
+        assert_eq!(cpu.mem_read_u16(0x01ff), PROGRAM_BEGIN + 0x0002);
     }
 
     #[cfg(test)]
@@ -2276,12 +2276,13 @@ mod tests {
         #[test]
         fn implied_with_jsr() {
             let mut cpu = CPU::new();
+            // (PROGRAM_BEGIN=$8000)
             // JSR $1122 ; $8000
             // LDA #$AA  ; $8003
             // BRK       ; $8005
             // LDX #$BB  ; $8006
             // RTS       ; $8008
-            cpu.mem_write_u16(0x1122, 0x8006);
+            cpu.mem_write_u16(0x1122, PROGRAM_BEGIN + 0x0006);
             cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0xa9, 0xaa, 0x00, 0xa2, 0xbb, 0x60]);
             assert_eq!(cpu.a, 0xaa);
             assert_eq!(cpu.x, 0xbb);
