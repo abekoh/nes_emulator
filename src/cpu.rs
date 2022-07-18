@@ -163,7 +163,7 @@ impl CPU {
         self.a = 0;
         self.x = 0;
         self.status = 0;
-        self.pc = self.mem_read_u16(PROGRAM_BEGIN);
+        self.pc = self.mem_read_u16(PC_BEGIN);
     }
 
     pub fn run(&mut self) {
