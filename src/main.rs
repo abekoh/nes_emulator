@@ -1,8 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::intrinsics::unreachable;
-
+use rand::Rng;
 use sdl2::event::Event;
 use sdl2::EventPump;
 use sdl2::keyboard::Keycode;
@@ -59,7 +58,8 @@ fn main() {
 
     cpu.run_with_callback(move |cpu| {
         handle_user_input(cpu, &mut event_pump);
-        cpu.mem_write(0xfe, rng.get_range(1, 16));
+        let rn = rng.gen_range(1..16);
+        cpu.mem_write(0xfe, rn);
 
         if read_screen_state(cpu, &mut screen_state) {
             texture.update(None, &screen_state, 32 * 3).unwrap();
@@ -113,7 +113,7 @@ fn read_screen_state(cpu: &CPU, frame: &mut [u8; 32 * 3 * 32]) -> bool {
     let mut frame_idx = 0;
     let mut update = false;
     for i in 0x0200..0x0600 {
-        let color_idx = cpu.mem_read(i as i16);
+        let color_idx = cpu.mem_read(i as u16);
         let (b1, b2, b3) = color(color_idx).rgb();
         if frame[frame_idx] != b1 || frame[frame_idx + 1] != b2 || frame[frame_idx + 2] != b3 {
             frame[frame_idx] = b1;
