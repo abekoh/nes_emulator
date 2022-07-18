@@ -213,6 +213,7 @@ impl CPU {
                 Mnemonic::JMP => self.jmp(&opcode.mode),
                 Mnemonic::JSR => self.jsr(&opcode.mode),
                 Mnemonic::RTS => self.rts(),
+                Mnemonic::RTI => self.rti(),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -517,6 +518,14 @@ impl CPU {
     fn rts(&mut self) {
         let addr = self.stack_pop_u16() + 1;
         self.pc = addr;
+        self.jumped = true;
+    }
+
+    fn rti(&mut self) {
+        self.status = self.stack_pop();
+        self.set_flag(&Flag::Break, false);
+        self.set_flag(&Flag::Reserved, true);
+        self.pc = self.stack_pop_u16();
         self.jumped = true;
     }
 }
@@ -2230,5 +2239,16 @@ mod tests {
             assert_eq!(cpu.a, 0xaa);
             assert_eq!(cpu.x, 0xbb);
         }
+    }
+
+    #[test]
+    fn rti() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x40]);
+        cpu.stack_push_u16(0x1122);
+        cpu.stack_push(0b1101_1111);
+        cpu.run();
+        assert_eq!(cpu.pc, 0x1123);
+        assert_eq!(cpu.status, 0b1110_1111);
     }
 }
