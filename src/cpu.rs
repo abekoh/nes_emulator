@@ -2319,6 +2319,25 @@ mod tests {
             cpu.run();
             assert_eq!(cpu.a, 0xaa);
         }
+
+        #[test]
+        fn immediate_backward() {
+            let mut cpu = CPU::new();
+            // (PROGRAM_BEGIN=$8000)
+            //   JMP $8006 ; $8000
+            // label:
+            //   LDA #$aa  ; $8003
+            //   BRK       ; $8005
+            //   BCC label ; $8006
+            //   BRK       ; $8007
+            let jump_to = PROGRAM_BEGIN + 0x0006;
+            let jump_to_hi = (jump_to >> 8) as u8;
+            let jump_to_lo = jump_to as u8;
+            cpu.load_reset(vec![0x4c, jump_to_lo, jump_to_hi, 0xa9, 0xaa, 0x00, 0x90, 0xfb, 0x00]);
+            cpu.set_flag(&Flag::Carry, false);
+            cpu.run();
+            assert_eq!(cpu.a, 0xaa);
+        }
     }
 
     #[test]
