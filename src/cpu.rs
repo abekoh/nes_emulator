@@ -487,10 +487,17 @@ impl CPU {
     fn pop(&mut self, reg: &Register) {
         let val = self.stack_pop();
         self.set_register(reg, val);
-        if *reg == Register::A {
-            self.update_zero_flag(val);
-            self.update_negative_flag(val);
-        }
+        match *reg {
+            Register::A => {
+                self.update_zero_flag(val);
+                self.update_negative_flag(val);
+            }
+            Register::P => {
+                self.set_flag(&Flag::Break, false);
+                self.set_flag(&Flag::Reserved, true);
+            }
+            _ => {}
+        };
     }
 
     fn stack_push(&mut self, data: u8) {
@@ -2204,11 +2211,11 @@ mod tests {
     #[test]
     fn plp() {
         let mut cpu = CPU::new();
-        cpu.mem_write(0x01bb, 0xaa);
+        cpu.mem_write(0x01bb, 0b1101_1111);
         cpu.load_reset(vec![0x28, 0x00]);
         cpu.sp = 0xba;
         cpu.run();
-        assert_eq!(cpu.status, 0xaa);
+        assert_eq!(cpu.status, 0b1110_1111); // Break=false, Reserved=true
         assert_eq!(cpu.sp, 0xbb);
     }
 
