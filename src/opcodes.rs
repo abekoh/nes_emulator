@@ -18,6 +18,7 @@ impl OpCode {
     }
 }
 
+#[derive(Debug)]
 pub enum Mnemonic {
     LDA,
     LDX,

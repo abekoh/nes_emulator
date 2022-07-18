@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use log::debug;
 
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
@@ -181,6 +182,8 @@ impl CPU {
             self.jumped = false;
 
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
+
+            debug!("code: {:x}, mnemonic: {:?}, mode: {:?}", code, opcode.mnemonic, opcode.mode);
 
             match &(opcode.mnemonic) {
                 Mnemonic::LDA => self.ld(&Register::A, &opcode.mode),

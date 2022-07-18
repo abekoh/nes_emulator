@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+use log::debug;
 use rand::Rng;
 use sdl2::event::Event;
 use sdl2::EventPump;
@@ -13,6 +14,8 @@ pub mod cpu;
 pub mod opcodes;
 
 fn main() {
+    env_logger::init();
+
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let window = video_subsystem
