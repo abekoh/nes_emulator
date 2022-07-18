@@ -3,8 +3,10 @@ use std::collections::HashMap;
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
 
+const PROGRAM_BEGIN: u16 = 0x8000;
 const STACK_BEGIN: u16 = 0x0100;
 const SP_BEGIN: u8 = 0xff;
+const PC_BEGIN: u16 = 0xfffc;
 
 pub struct CPU {
     pub a: u8,
@@ -153,8 +155,8 @@ impl CPU {
     }
 
     fn load(&mut self, program: Vec<u8>) {
-        self.mem[0x8000..(0x8000 + program.len())].copy_from_slice(&program[..]);
-        self.mem_write_u16(0xFFFC, 0x8000);
+        self.mem[PROGRAM_BEGIN as usize..(PROGRAM_BEGIN as usize + program.len())].copy_from_slice(&program[..]);
+        self.mem_write_u16(PC_BEGIN as u16, PROGRAM_BEGIN);
     }
 
     fn reset(&mut self) {
