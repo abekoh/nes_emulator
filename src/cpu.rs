@@ -532,12 +532,13 @@ impl CPU {
     }
 
     fn branch(&mut self, flag: &Flag, cond: bool, mode: &AddressingMode) {
-        let flag_val = self.get_flag(flag);
-        if flag_val == cond {
-            let addr = self.get_operand_address(mode);
-            let val = self.mem_read(addr);
-            self.pc = self.pc.wrapping_add(val as u16);
+        if self.get_flag(flag) != cond {
+            return;
         }
+        let addr = self.get_operand_address(mode);
+        let val = self.mem_read(addr);
+        self.pc = self.pc.wrapping_add(val as u16).wrapping_add(1);
+        self.jumped = true;
     }
 }
 
