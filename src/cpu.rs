@@ -515,7 +515,7 @@ impl CPU {
     }
 
     fn rts(&mut self) {
-        let addr = self.stack_pop_u16();
+        let addr = self.stack_pop_u16() + 1;
         self.pc = addr;
         self.jumped = true;
     }
@@ -2203,13 +2203,32 @@ mod tests {
         assert_eq!(cpu.mem_read_u16(0x01ff), 0x8002);
     }
 
-    #[test]
-    fn rts() {
-        let mut cpu = CPU::new();
-        cpu.load_reset(vec![0x60]);
-        cpu.stack_push_u16(0x1122);
-        cpu.run();
-        assert_eq!(cpu.pc, 0x1123);
-        assert_eq!(cpu.sp, SP_BEGIN);
+    #[cfg(test)]
+    mod rts {
+        use super::*;
+
+        #[test]
+        fn implied() {
+            let mut cpu = CPU::new();
+            cpu.load_reset(vec![0x60]);
+            cpu.stack_push_u16(0x1122);
+            cpu.run();
+            assert_eq!(cpu.pc, 0x1124);
+            assert_eq!(cpu.sp, SP_BEGIN);
+        }
+
+        #[test]
+        fn implied_with_jsr() {
+            let mut cpu = CPU::new();
+            // JSR $1122 ; $8000
+            // LDA #$AA  ; $8003
+            // BRK       ; $8005
+            // LDX #$BB  ; $8006
+            // RTS       ; $8008
+            cpu.mem_write_u16(0x1122, 0x8006);
+            cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0xa9, 0xaa, 0x00, 0xa2, 0xbb, 0x60]);
+            assert_eq!(cpu.a, 0xaa);
+            assert_eq!(cpu.x, 0xbb);
+        }
     }
 }
