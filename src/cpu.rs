@@ -478,6 +478,10 @@ impl CPU {
     fn push(&mut self, reg: &Register) {
         let reg_val = self.get_register(reg);
         self.stack_push(reg_val);
+        if *reg == Register::P {
+            self.set_flag(&Flag::Break, true);
+            self.set_flag(&Flag::Reserved, true);
+        }
     }
 
     fn pop(&mut self, reg: &Register) {
@@ -2182,6 +2186,8 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.mem_read(0x01ff), 0xaa);
         assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(cpu.get_flag(&Flag::Break), true);
+        assert_eq!(cpu.get_flag(&Flag::Reserved), true);
     }
 
     #[test]
