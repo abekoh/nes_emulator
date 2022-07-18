@@ -2453,6 +2453,12 @@ mod tests {
     }
 
     #[test]
+    fn brk() {
+        let mut cpu = CPU::new();
+        cpu.load_reset_run(vec![0x00]);
+    }
+
+    #[test]
     fn nop() {
         let mut cpu = CPU::new();
         cpu.load_reset_run(vec![0xea, 0x00]);
