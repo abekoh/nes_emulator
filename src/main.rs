@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 
-use log::debug;
 use rand::Rng;
 use sdl2::event::Event;
 use sdl2::EventPump;
