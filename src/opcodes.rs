@@ -60,6 +60,12 @@ pub enum Mnemonic {
     RTI,
     BCC,
     BCS,
+    BEQ,
+    BMI,
+    BNE,
+    BPL,
+    BVC,
+    BVS,
     BRK,
 }
 
@@ -285,6 +291,24 @@ lazy_static! {
 
         // BCS
         OpCode::new(0xb0, Mnemonic::BCS, AddressingMode::Immediate),
+
+        // BEQ
+        OpCode::new(0xf0, Mnemonic::BEQ, AddressingMode::Immediate),
+
+        // BMI
+        OpCode::new(0x30, Mnemonic::BMI, AddressingMode::Immediate),
+
+        // BNE
+        OpCode::new(0xd0, Mnemonic::BNE, AddressingMode::Immediate),
+
+        // BPL
+        OpCode::new(0x10, Mnemonic::BPL, AddressingMode::Immediate),
+
+        // BVC
+        OpCode::new(0x50, Mnemonic::BVC, AddressingMode::Immediate),
+
+        // BVS
+        OpCode::new(0x70, Mnemonic::BVS, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
