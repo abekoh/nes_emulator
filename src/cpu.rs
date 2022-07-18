@@ -183,7 +183,7 @@ impl CPU {
 
             let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
-            debug!("code: {:x}, mnemonic: {:?}, mode: {:?}", code, opcode.mnemonic, opcode.mode);
+            debug!("code: 0x{:x}, mnemonic: {:?}, mode: {:?}", code, opcode.mnemonic, opcode.mode);
 
             match &(opcode.mnemonic) {
                 Mnemonic::LDA => self.ld(&Register::A, &opcode.mode),
