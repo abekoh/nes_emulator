@@ -223,6 +223,12 @@ impl CPU {
                 Mnemonic::BVS => self.branch(&Flag::OverFlow, true, &opcode.mode),
                 Mnemonic::BVC => self.branch(&Flag::OverFlow, false, &opcode.mode),
                 Mnemonic::CLC => self.set_flag(&Flag::Carry, false),
+                Mnemonic::CLD => self.set_flag(&Flag::Decimal, false),
+                Mnemonic::CLI => self.set_flag(&Flag::IRQ_Limited, false),
+                Mnemonic::CLV => self.set_flag(&Flag::OverFlow, false),
+                Mnemonic::SEC => self.set_flag(&Flag::Carry, true),
+                Mnemonic::SED => self.set_flag(&Flag::Decimal, true),
+                Mnemonic::SEI => self.set_flag(&Flag::IRQ_Limited, true),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {

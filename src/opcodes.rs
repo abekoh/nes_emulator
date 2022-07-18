@@ -67,6 +67,12 @@ pub enum Mnemonic {
     BVC,
     BVS,
     CLC,
+    CLD,
+    CLI,
+    CLV,
+    SEC,
+    SED,
+    SEI,
     BRK,
 }
 
@@ -313,6 +319,24 @@ lazy_static! {
 
         // CLC
         OpCode::new(0x18, Mnemonic::CLC, AddressingMode::NoneAddressing),
+
+        // CLD
+        OpCode::new(0xd8, Mnemonic::CLD, AddressingMode::NoneAddressing),
+
+        // CLI
+        OpCode::new(0x58, Mnemonic::CLI, AddressingMode::NoneAddressing),
+
+        // CLV
+        OpCode::new(0xb8, Mnemonic::CLV, AddressingMode::NoneAddressing),
+
+        // SEC
+        OpCode::new(0x38, Mnemonic::SEC, AddressingMode::NoneAddressing),
+
+        // SED
+        OpCode::new(0xf8, Mnemonic::SED, AddressingMode::NoneAddressing),
+
+        // SEI
+        OpCode::new(0x78, Mnemonic::SEI, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
