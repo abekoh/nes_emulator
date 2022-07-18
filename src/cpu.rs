@@ -2302,18 +2302,23 @@ mod tests {
         assert_eq!(cpu.status, 0b1110_1111);
     }
 
-    #[test]
-    fn bcc() {
-        let mut cpu = CPU::new();
-        //   BCC label
-        //   BRK
-        // label:
-        //   LDA #$aa
-        //   BRK
-        cpu.load_reset(vec![0x90, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
-        cpu.set_flag(&Flag::Carry, false);
-        cpu.run();
-        assert_eq!(cpu.a, 0xaa);
+    #[cfg(test)]
+    mod bcc {
+        use super::*;
+
+        #[test]
+        fn immediate_forward() {
+            let mut cpu = CPU::new();
+            //   BCC label
+            //   BRK
+            // label:
+            //   LDA #$aa
+            //   BRK
+            cpu.load_reset(vec![0x90, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+            cpu.set_flag(&Flag::Carry, false);
+            cpu.run();
+            assert_eq!(cpu.a, 0xaa);
+        }
     }
 
     #[test]
