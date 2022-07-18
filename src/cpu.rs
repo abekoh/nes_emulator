@@ -215,6 +215,7 @@ impl CPU {
                 Mnemonic::RTS => self.rts(),
                 Mnemonic::RTI => self.rti(),
                 Mnemonic::BCC => self.branch(&Flag::Carry, false, &opcode.mode),
+                Mnemonic::BCS => self.branch(&Flag::Carry, true, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -2272,6 +2273,20 @@ mod tests {
         //   BRK
         cpu.load_reset(vec![0x90, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
         cpu.set_flag(&Flag::Carry, false);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bcs() {
+        let mut cpu = CPU::new();
+        //   BCS label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0xb0, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::Carry, true);
         cpu.run();
         assert_eq!(cpu.a, 0xaa);
     }

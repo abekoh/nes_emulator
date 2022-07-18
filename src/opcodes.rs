@@ -59,6 +59,7 @@ pub enum Mnemonic {
     RTS,
     RTI,
     BCC,
+    BCS,
     BRK,
 }
 
@@ -281,6 +282,9 @@ lazy_static! {
 
         // BCC
         OpCode::new(0x90, Mnemonic::BCC, AddressingMode::Immediate),
+
+        // BCS
+        OpCode::new(0xb0, Mnemonic::BCS, AddressingMode::Immediate),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
