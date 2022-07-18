@@ -118,7 +118,7 @@ impl CPU {
         self.mem[addr as usize]
     }
 
-    fn mem_write(&mut self, addr: u16, data: u8) {
+    pub fn mem_write(&mut self, addr: u16, data: u8) {
         self.mem[addr as usize] = data;
     }
 
