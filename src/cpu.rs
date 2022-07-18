@@ -571,7 +571,7 @@ impl CPU {
             return;
         }
         let addr = self.get_operand_address(mode);
-        let val = self.mem_read(addr);
+        let val: i8 = self.mem_read(addr) as i8;
         self.pc = self.pc.wrapping_add(val as u16).wrapping_add(1);
         self.jumped = true;
     }
