@@ -105,7 +105,7 @@ fn color(byte: u8) -> Color {
         0x6 | 0xd => sdl2::pixels::Color::MAGENTA,
         0x7 | 0xe => sdl2::pixels::Color::YELLOW,
         0x8 | 0xf => sdl2::pixels::Color::CYAN,
-        _ => unreachable!(),
+        _ => sdl2::pixels::Color::CYAN,
     }
 }
 
