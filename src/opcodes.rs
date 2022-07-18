@@ -66,6 +66,7 @@ pub enum Mnemonic {
     BPL,
     BVC,
     BVS,
+    CLC,
     BRK,
 }
 
@@ -309,6 +310,9 @@ lazy_static! {
 
         // BVS
         OpCode::new(0x70, Mnemonic::BVS, AddressingMode::Immediate),
+
+        // CLC
+        OpCode::new(0x18, Mnemonic::CLC, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

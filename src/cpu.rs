@@ -222,6 +222,7 @@ impl CPU {
                 Mnemonic::BPL => self.branch(&Flag::Negative, false, &opcode.mode),
                 Mnemonic::BVS => self.branch(&Flag::OverFlow, true, &opcode.mode),
                 Mnemonic::BVC => self.branch(&Flag::OverFlow, false, &opcode.mode),
+                Mnemonic::CLC => self.set_flag(&Flag::Carry, false),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
