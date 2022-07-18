@@ -2290,4 +2290,88 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.a, 0xaa);
     }
+
+    #[test]
+    fn beq() {
+        let mut cpu = CPU::new();
+        //   BEQ label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0xf0, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::Zero, true);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bmi() {
+        let mut cpu = CPU::new();
+        //   BMI label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0x30, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::Negative, true);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bne() {
+        let mut cpu = CPU::new();
+        //   BNE label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0xd0, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::Zero, false);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bpl() {
+        let mut cpu = CPU::new();
+        //   BPL label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0x10, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::Negative, false);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bvc() {
+        let mut cpu = CPU::new();
+        //   BVC label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0x50, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::OverFlow, false);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
+
+    #[test]
+    fn bvs() {
+        let mut cpu = CPU::new();
+        //   BVS label
+        //   BRK
+        // label:
+        //   LDA #$aa
+        //   BRK
+        cpu.load_reset(vec![0x70, 0x01, 0x00, 0xa9, 0xaa, 0x00]);
+        cpu.set_flag(&Flag::OverFlow, true);
+        cpu.run();
+        assert_eq!(cpu.a, 0xaa);
+    }
 }
