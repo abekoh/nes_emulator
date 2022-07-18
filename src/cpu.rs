@@ -2391,4 +2391,58 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.get_flag(&Flag::Carry), false);
     }
+
+    #[test]
+    fn cld() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0xd8, 0x00]);
+        cpu.set_flag(&Flag::Decimal, true);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::Decimal), false);
+    }
+
+    #[test]
+    fn cli() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x58, 0x00]);
+        cpu.set_flag(&Flag::IRQ_Limited, true);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::IRQ_Limited), false);
+    }
+
+    #[test]
+    fn clv() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0xb8, 0x00]);
+        cpu.set_flag(&Flag::OverFlow, true);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::OverFlow), false);
+    }
+
+    #[test]
+    fn sec() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x38, 0x00]);
+        cpu.set_flag(&Flag::Carry, false);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::Carry), true);
+    }
+
+    #[test]
+    fn sed() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0xf8, 0x00]);
+        cpu.set_flag(&Flag::Decimal, false);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::Decimal), true);
+    }
+
+    #[test]
+    fn sei() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x78, 0x00]);
+        cpu.set_flag(&Flag::IRQ_Limited, false);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::IRQ_Limited), true);
+    }
 }
