@@ -214,14 +214,14 @@ impl CPU {
                 Mnemonic::JSR => self.jsr(&opcode.mode),
                 Mnemonic::RTS => self.rts(),
                 Mnemonic::RTI => self.rti(),
-                Mnemonic::BCC => self.branch(&Flag::Carry, false, &opcode.mode),
                 Mnemonic::BCS => self.branch(&Flag::Carry, true, &opcode.mode),
+                Mnemonic::BCC => self.branch(&Flag::Carry, false, &opcode.mode),
                 Mnemonic::BEQ => self.branch(&Flag::Zero, true, &opcode.mode),
-                Mnemonic::BMI => self.branch(&Flag::Negative, true, &opcode.mode),
                 Mnemonic::BNE => self.branch(&Flag::Zero, false, &opcode.mode),
+                Mnemonic::BMI => self.branch(&Flag::Negative, true, &opcode.mode),
                 Mnemonic::BPL => self.branch(&Flag::Negative, false, &opcode.mode),
-                Mnemonic::BVC => self.branch(&Flag::OverFlow, false, &opcode.mode),
                 Mnemonic::BVS => self.branch(&Flag::OverFlow, true, &opcode.mode),
+                Mnemonic::BVC => self.branch(&Flag::OverFlow, false, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
