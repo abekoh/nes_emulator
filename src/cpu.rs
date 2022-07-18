@@ -36,7 +36,6 @@ pub enum AddressingMode {
 impl AddressingMode {
     fn pc_offset(&self) -> u16 {
         match self {
-            AddressingMode::NoneAddressing => 0,
             AddressingMode::Immediate => 1,
             AddressingMode::ZeroPage => 1,
             AddressingMode::ZeroPage_X => 1,
@@ -47,6 +46,7 @@ impl AddressingMode {
             AddressingMode::Indirect => 1,
             AddressingMode::Indirect_X => 1,
             AddressingMode::Indirect_Y => 1,
+            AddressingMode::NoneAddressing => 0,
         }
     }
 }
@@ -214,6 +214,7 @@ impl CPU {
                 Mnemonic::JSR => self.jsr(&opcode.mode),
                 Mnemonic::RTS => self.rts(),
                 Mnemonic::RTI => self.rti(),
+                Mnemonic::BCC => self.branch(&Flag::Carry, false, &opcode.mode),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -527,6 +528,15 @@ impl CPU {
         self.set_flag(&Flag::Reserved, true);
         self.pc = self.stack_pop_u16();
         self.jumped = true;
+    }
+
+    fn branch(&mut self, flag: &Flag, cond: bool, mode: &AddressingMode) {
+        let flag_val = self.get_flag(flag);
+        if flag_val == cond {
+            let addr = self.get_operand_address(mode);
+            let val = self.mem_read(addr);
+            self.pc = self.pc.wrapping_add(val as u16);
+        }
     }
 }
 
