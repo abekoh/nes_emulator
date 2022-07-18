@@ -74,13 +74,11 @@ pub enum Mnemonic {
     SED,
     SEI,
     BRK,
+    NOP,
 }
 
 lazy_static! {
     pub static ref CPU_OPS_CODES: Vec<OpCode> = vec![
-        // BRK
-        OpCode::new(0x00, Mnemonic::BRK, AddressingMode::NoneAddressing),
-
         // LDA
         OpCode::new(0xa9, Mnemonic::LDA, AddressingMode::Immediate),
         OpCode::new(0xa5, Mnemonic::LDA, AddressingMode::ZeroPage),
@@ -337,6 +335,12 @@ lazy_static! {
 
         // SEI
         OpCode::new(0x78, Mnemonic::SEI, AddressingMode::NoneAddressing),
+
+        // BRK
+        OpCode::new(0x00, Mnemonic::BRK, AddressingMode::NoneAddressing),
+
+        // NOP
+        OpCode::new(0xea, Mnemonic::NOP, AddressingMode::NoneAddressing),
     ];
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

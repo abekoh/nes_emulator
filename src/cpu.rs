@@ -229,6 +229,7 @@ impl CPU {
                 Mnemonic::SED => self.set_flag(&Flag::Decimal, true),
                 Mnemonic::SEI => self.set_flag(&Flag::IRQDisabled, true),
                 Mnemonic::BRK => return,
+                Mnemonic::NOP => {}
             }
             if !self.jumped {
                 self.pc += opcode.mode.pc_offset();
@@ -2449,5 +2450,11 @@ mod tests {
         cpu.set_flag(&Flag::IRQDisabled, false);
         cpu.run();
         assert_eq!(cpu.get_flag(&Flag::IRQDisabled), true);
+    }
+
+    #[test]
+    fn nop() {
+        let mut cpu = CPU::new();
+        cpu.load_reset_run(vec![0xea, 0x00]);
     }
 }
