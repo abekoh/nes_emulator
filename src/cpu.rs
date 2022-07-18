@@ -537,16 +537,14 @@ impl CPU {
 
     fn jmp(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read_u16(addr);
-        self.pc = mem_val;
+        self.pc = addr;
         self.jumped = true;
     }
 
     fn jsr(&mut self, mode: &AddressingMode) {
         let addr = self.get_operand_address(mode);
-        let mem_val = self.mem_read_u16(addr);
         self.stack_push_u16(self.pc + (mode.pc_offset() - 1));
-        self.pc = mem_val;
+        self.pc = addr;
         self.jumped = true;
     }
 
@@ -2235,27 +2233,24 @@ mod tests {
         #[test]
         fn absolute() {
             let mut cpu = CPU::new();
-            cpu.mem_write_u16(0x1122, 0x3344);
             cpu.load_reset_run(vec![0x4c, 0x22, 0x11, 0x00]);
-            assert_eq!(cpu.pc, 0x3345);
+            assert_eq!(cpu.pc, 0x1123);
         }
 
         #[test]
         fn indirect() {
             let mut cpu = CPU::new();
             cpu.mem_write_u16(0x11, 0x3344);
-            cpu.mem_write_u16(0x3344, 0x5566);
             cpu.load_reset_run(vec![0x6c, 0x11, 0x00]);
-            assert_eq!(cpu.pc, 0x5567);
+            assert_eq!(cpu.pc, 0x3345);
         }
     }
 
     #[test]
     fn jsr() {
         let mut cpu = CPU::new();
-        cpu.mem_write_u16(0x1122, 0x3344);
         cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0x00]);
-        assert_eq!(cpu.pc, 0x3345);
+        assert_eq!(cpu.pc, 0x1123);
         assert_eq!(cpu.mem_read_u16(0x01ff), PROGRAM_BEGIN + 0x0002);
     }
 
@@ -2282,8 +2277,11 @@ mod tests {
             // BRK       ; $8005
             // LDX #$BB  ; $8006
             // RTS       ; $8008
-            cpu.mem_write_u16(0x1122, PROGRAM_BEGIN + 0x0006);
-            cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0xa9, 0xaa, 0x00, 0xa2, 0xbb, 0x60]);
+            // cpu.mem_write_u16(0x1122, PROGRAM_BEGIN + 0x0006);
+            let jump_to = PROGRAM_BEGIN + 0x0006;
+            let jump_to_hi = (jump_to >> 8) as u8;
+            let jump_to_lo = jump_to as u8;
+            cpu.load_reset_run(vec![0x20, jump_to_lo, jump_to_hi, 0xa9, 0xaa, 0x00, 0xa2, 0xbb, 0x60]);
             assert_eq!(cpu.a, 0xaa);
             assert_eq!(cpu.x, 0xbb);
         }
