@@ -51,11 +51,10 @@ impl AddressingMode {
     }
 }
 
-#[allow(non_camel_case_types, dead_code)]
 enum Flag {
     Carry,
     Zero,
-    IRQ_Limited,
+    IRQDisabled,
     Decimal,
     Break,
     Reserved,
@@ -77,7 +76,7 @@ impl Flag {
         match self {
             Flag::Carry => 0b0000_0001,
             Flag::Zero => 0b0000_0010,
-            Flag::IRQ_Limited => 0b0000_0100,
+            Flag::IRQDisabled => 0b0000_0100,
             Flag::Decimal => 0b0000_1000,
             Flag::Break => 0b0001_0000,
             Flag::Reserved => 0b0010_0000,
@@ -224,11 +223,11 @@ impl CPU {
                 Mnemonic::BVC => self.branch(&Flag::OverFlow, false, &opcode.mode),
                 Mnemonic::CLC => self.set_flag(&Flag::Carry, false),
                 Mnemonic::CLD => self.set_flag(&Flag::Decimal, false),
-                Mnemonic::CLI => self.set_flag(&Flag::IRQ_Limited, false),
+                Mnemonic::CLI => self.set_flag(&Flag::IRQDisabled, false),
                 Mnemonic::CLV => self.set_flag(&Flag::OverFlow, false),
                 Mnemonic::SEC => self.set_flag(&Flag::Carry, true),
                 Mnemonic::SED => self.set_flag(&Flag::Decimal, true),
-                Mnemonic::SEI => self.set_flag(&Flag::IRQ_Limited, true),
+                Mnemonic::SEI => self.set_flag(&Flag::IRQDisabled, true),
                 Mnemonic::BRK => return,
             }
             if !self.jumped {
@@ -2411,9 +2410,9 @@ mod tests {
     fn cli() {
         let mut cpu = CPU::new();
         cpu.load_reset(vec![0x58, 0x00]);
-        cpu.set_flag(&Flag::IRQ_Limited, true);
+        cpu.set_flag(&Flag::IRQDisabled, true);
         cpu.run();
-        assert_eq!(cpu.get_flag(&Flag::IRQ_Limited), false);
+        assert_eq!(cpu.get_flag(&Flag::IRQDisabled), false);
     }
 
     #[test]
@@ -2447,8 +2446,8 @@ mod tests {
     fn sei() {
         let mut cpu = CPU::new();
         cpu.load_reset(vec![0x78, 0x00]);
-        cpu.set_flag(&Flag::IRQ_Limited, false);
+        cpu.set_flag(&Flag::IRQDisabled, false);
         cpu.run();
-        assert_eq!(cpu.get_flag(&Flag::IRQ_Limited), true);
+        assert_eq!(cpu.get_flag(&Flag::IRQDisabled), true);
     }
 }
