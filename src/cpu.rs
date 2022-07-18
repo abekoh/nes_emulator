@@ -2381,4 +2381,13 @@ mod tests {
         cpu.run();
         assert_eq!(cpu.a, 0xaa);
     }
+
+    #[test]
+    fn clc() {
+        let mut cpu = CPU::new();
+        cpu.load_reset(vec![0x18, 0x00]);
+        cpu.set_flag(&Flag::Carry, true);
+        cpu.run();
+        assert_eq!(cpu.get_flag(&Flag::Carry), false);
+    }
 }
