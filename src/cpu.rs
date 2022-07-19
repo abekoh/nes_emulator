@@ -8,7 +8,7 @@ use crate::opcodes::Mnemonic;
 
 const PROGRAM_BEGIN: u16 = 0x0600;
 const STACK_BEGIN: u16 = 0x0100;
-const SP_BEGIN: u8 = 0xff;
+const SP_BEGIN: u8 = 0xfd;
 const PC_BEGIN: u16 = 0xfffc;
 
 pub struct CPU {
@@ -2182,8 +2182,8 @@ mod tests {
         cpu.load_reset(vec![0x48, 0x00]);
         cpu.a = 0xaa;
         cpu.run();
-        assert_eq!(cpu.mem_read(0x01ff), 0xaa);
-        assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(cpu.mem_read(0x01fd), 0xaa);
+        assert_eq!(cpu.sp, 0xfc);
     }
 
     #[test]
@@ -2192,8 +2192,8 @@ mod tests {
         cpu.load_reset(vec![0x08, 0x00]);
         cpu.status = 0xaa;
         cpu.run();
-        assert_eq!(cpu.mem_read(0x01ff), 0xaa);
-        assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(cpu.mem_read(0x01fd), 0xaa);
+        assert_eq!(cpu.sp, 0xfc);
         assert_eq!(cpu.get_flag(&Flag::Break), true);
         assert_eq!(cpu.get_flag(&Flag::Reserved), true);
     }
@@ -2245,7 +2245,7 @@ mod tests {
         let mut cpu = CPU::new();
         cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0x00]);
         assert_eq!(cpu.pc, 0x1123);
-        assert_eq!(cpu.mem_read_u16(0x01ff), PROGRAM_BEGIN + 0x0002);
+        assert_eq!(cpu.mem_read_u16(0x01fd), PROGRAM_BEGIN + 0x0002);
     }
 
     #[cfg(test)]
