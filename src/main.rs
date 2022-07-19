@@ -8,9 +8,12 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::{Color, PixelFormatEnum};
 
 use crate::cpu::CPU;
+use crate::mem::Mem;
 
+pub mod bus;
 pub mod cpu;
 pub mod opcodes;
+pub mod mem;
 
 fn main() {
     env_logger::init();
