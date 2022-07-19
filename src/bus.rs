@@ -49,7 +49,6 @@ impl Mem for Bus {
             }
             _ => {
                 debug!("Ignoreing mem write-access at {}", addr);
-                0
             }
         }
     }

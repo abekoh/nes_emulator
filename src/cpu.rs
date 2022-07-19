@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use log::debug;
 
+use crate::bus::Bus;
 use crate::mem::Mem;
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
@@ -19,6 +20,7 @@ pub struct CPU {
     pub status: u8,
     pub pc: u16,
     mem: [u8; 0xFFFF],
+    bus: Bus,
     jumped: bool,
 }
 
@@ -107,11 +109,19 @@ fn int_type(val: u8) -> IntType {
 
 impl Mem for CPU {
     fn mem_read(&self, addr: u16) -> u8 {
-        self.mem[addr as usize]
+        self.bus.mem_read(addr)
     }
 
     fn mem_write(&mut self, addr: u16, data: u8) {
-        self.mem[addr as usize] = data;
+        self.bus.mem_write(addr, data);
+    }
+
+    fn mem_read_u16(&self, pos: u16) -> u16 {
+        self.bus.mem_read_u16(pos)
+    }
+
+    fn mem_write_u16(&mut self, pos: u16, data: u16) {
+        self.bus.mem_write_u16(pos, data);
     }
 }
 
@@ -125,12 +135,13 @@ impl CPU {
             status: 0,
             pc: 0,
             mem: [0; 0xFFFF],
+            bus: Bus::new(),
             jumped: false,
         }
     }
 
     fn mem_write_with_update_flags(&mut self, addr: u16, data: u8) {
-        self.mem[addr as usize] = data;
+        self.mem_write(addr, data);
         self.update_zero_flag(data);
         self.update_negative_flag(data);
     }
@@ -147,7 +158,9 @@ impl CPU {
     }
 
     fn load(&mut self, program: Vec<u8>) {
-        self.mem[PROGRAM_BEGIN as usize..(PROGRAM_BEGIN as usize + program.len())].copy_from_slice(&program[..]);
+        for i in 0..(program.len() as u16) {
+            self.mem_write(PROGRAM_BEGIN + i, program[i as usize]);
+        }
         self.mem_write_u16(PC_BEGIN as u16, PROGRAM_BEGIN);
     }
 
