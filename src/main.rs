@@ -55,7 +55,7 @@ fn main() {
         0xea, 0xca, 0xd0, 0xfb, 0x60,
     ];
 
-    let mut cpu = CPU::new();
+    let mut cpu = CPU::new_for_test();
     cpu.load_reset(game_code);
 
     let mut screen_state = [0 as u8; 32 * 3 * 32];
