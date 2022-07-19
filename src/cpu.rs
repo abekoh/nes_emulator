@@ -12,12 +12,12 @@ const SP_BEGIN: u8 = 0xfd;
 const PC_BEGIN: u16 = 0xfffc;
 
 pub struct CPU {
-    pub a: u8,
-    pub x: u8,
-    pub y: u8,
-    pub sp: u8,
-    pub status: u8,
-    pub pc: u16,
+    a: u8,
+    x: u8,
+    y: u8,
+    sp: u8,
+    status: u8,
+    pc: u16,
     ram: Box<dyn Mem>,
     jumped: bool,
 }
