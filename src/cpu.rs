@@ -106,11 +106,11 @@ fn int_type(val: u8) -> IntType {
     }
 }
 
-struct VirtualRAM {
+struct BigRAM {
     mem: [u8; 0xffff],
 }
 
-impl VirtualRAM {
+impl BigRAM {
     fn new() -> Self {
         Self {
             mem: [0; 0xffff]
@@ -118,7 +118,7 @@ impl VirtualRAM {
     }
 }
 
-impl Mem for VirtualRAM {
+impl Mem for BigRAM {
     fn mem_read(&self, addr: u16) -> u8 {
         self.mem[addr as usize]
     }
@@ -152,7 +152,7 @@ impl CPU {
         }
     }
 
-    pub fn new_with_big_mem() -> Self {
+    pub fn new_with_big_ram() -> Self {
         CPU {
             a: 0,
             x: 0,
@@ -160,7 +160,7 @@ impl CPU {
             sp: SP_BEGIN,
             status: 0,
             pc: 0,
-            ram: Box::new(VirtualRAM::new()),
+            ram: Box::new(BigRAM::new()),
             jumped: false,
         }
     }
@@ -615,7 +615,7 @@ mod tests {
 
         #[test]
         fn zero_on() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // LDA #$00
             cpu.load_reset_run(vec![0xa9, 0x00, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b10);
@@ -623,7 +623,7 @@ mod tests {
 
         #[test]
         fn zero_off() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // LDA #$01
             cpu.load_reset_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b0000_0010, 0b00);
@@ -631,7 +631,7 @@ mod tests {
 
         #[test]
         fn negative_on() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // LDA #$ff
             cpu.load_reset_run(vec![0xa9, 0xff, 0x00]);
             assert_eq!(cpu.status & 0b1000_0000, 0b1000_0000);
@@ -639,7 +639,7 @@ mod tests {
 
         #[test]
         fn negative_off() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // LDA #$01
             cpu.load_reset_run(vec![0xa9, 0x01, 0x00]);
             assert_eq!(cpu.status & 0b1000_0000, 0b0000_0000);
@@ -647,7 +647,7 @@ mod tests {
 
         #[test]
         fn carry_on() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // ADC #$ff
             cpu.load_reset(vec![0x69, 0xff, 0x00]);
             cpu.a = 0x01;
@@ -657,7 +657,7 @@ mod tests {
 
         #[test]
         fn carry_off() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // ADC #$01
             cpu.load_reset(vec![0x69, 0x01, 0x00]);
             cpu.a = 0x01;
@@ -667,7 +667,7 @@ mod tests {
 
         #[test]
         fn overflow_on() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x69, 0b0100_0000, 0x00]);
             cpu.a = 0b0100_0000;
             cpu.run();
@@ -676,7 +676,7 @@ mod tests {
 
         #[test]
         fn overflow_off() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // ADC #$ff
             cpu.load_reset(vec![0x69, 0xff, 0x00]);
             cpu.a = 0x01;
@@ -691,14 +691,14 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset_run(vec![0xa9, 0x11, 0x00]);
             assert_eq!(cpu.a, 0x11);
         }
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x55);
             cpu.load_reset_run(vec![0xa5, 0x10, 0x00]);
             assert_eq!(cpu.a, 0x55);
@@ -706,7 +706,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x55);
             cpu.load_reset(vec![0xb5, 0x10, 0x00]);
             cpu.reset();
@@ -717,7 +717,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x55);
             cpu.load_reset_run(vec![0xad, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.a, 0x55);
@@ -725,7 +725,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x55);
             cpu.load_reset(vec![0xbd, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -736,7 +736,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x55);
             cpu.load_reset(vec![0xb9, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -747,7 +747,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0x0a);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -760,7 +760,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0x0a);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -778,14 +778,14 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset_run(vec![0xa2, 0x11, 0x00]);
             assert_eq!(cpu.x, 0x11);
         }
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x55);
             cpu.load_reset_run(vec![0xa6, 0x10, 0x00]);
             assert_eq!(cpu.x, 0x55);
@@ -793,7 +793,7 @@ mod tests {
 
         #[test]
         fn zeropage_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x55);
             cpu.load_reset(vec![0xb6, 0x10, 0x00]);
             cpu.y = 0x01;
@@ -803,7 +803,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x55);
             cpu.load_reset_run(vec![0xae, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.x, 0x55);
@@ -811,7 +811,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x55);
             cpu.load_reset(vec![0xbe, 0x22, 0x11, 0x00]);
             cpu.y = 0x11;
@@ -826,14 +826,14 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset_run(vec![0xa0, 0x11, 0x00]);
             assert_eq!(cpu.y, 0x11);
         }
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x55);
             cpu.load_reset_run(vec![0xa4, 0x10, 0x00]);
             assert_eq!(cpu.y, 0x55);
@@ -841,7 +841,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x55);
             cpu.load_reset(vec![0xb4, 0x10, 0x00]);
             cpu.x = 0x01;
@@ -851,7 +851,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x55);
             cpu.load_reset_run(vec![0xac, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.y, 0x55);
@@ -859,7 +859,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x55);
             cpu.load_reset(vec![0xbc, 0x22, 0x11, 0x00]);
             cpu.x = 0x11;
@@ -874,7 +874,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x85, 0x01, 0x00]);
             cpu.a = 0x55;
             cpu.run();
@@ -883,7 +883,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x95, 0x01, 0x00]);
             cpu.a = 0x55;
             cpu.x = 0x01;
@@ -893,7 +893,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x8d, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.run();
@@ -902,7 +902,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x9d, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.x = 0x33;
@@ -912,7 +912,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x99, 0x22, 0x11, 0x00]);
             cpu.a = 0x55;
             cpu.y = 0x33;
@@ -922,7 +922,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x81, 0x00, 0x00]);
@@ -934,7 +934,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
             cpu.load_reset(vec![0x91, 0x01, 0x00]);
@@ -951,7 +951,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x86, 0x01, 0x00]);
             cpu.x = 0x55;
             cpu.run();
@@ -960,7 +960,7 @@ mod tests {
 
         #[test]
         fn zeropage_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x96, 0x01, 0x00]);
             cpu.x = 0x55;
             cpu.y = 0x01;
@@ -970,7 +970,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x8e, 0x22, 0x11, 0x00]);
             cpu.x = 0x55;
             cpu.run();
@@ -984,7 +984,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x84, 0x01, 0x00]);
             cpu.y = 0x55;
             cpu.run();
@@ -993,7 +993,7 @@ mod tests {
 
         #[test]
         fn zeropage_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x94, 0x01, 0x00]);
             cpu.x = 0x01;
             cpu.y = 0x55;
@@ -1003,7 +1003,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x8c, 0x22, 0x11, 0x00]);
             cpu.y = 0x55;
             cpu.run();
@@ -1013,7 +1013,7 @@ mod tests {
 
     #[test]
     fn tax() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xaa, 0x00]);
         cpu.a = 0x55;
         cpu.run();
@@ -1022,7 +1022,7 @@ mod tests {
 
     #[test]
     fn tay() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xa8, 0x00]);
         cpu.a = 0x55;
         cpu.run();
@@ -1031,7 +1031,7 @@ mod tests {
 
     #[test]
     fn tsx() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xba, 0x00]);
         cpu.sp = 0x55;
         cpu.run();
@@ -1040,7 +1040,7 @@ mod tests {
 
     #[test]
     fn txa() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x8a, 0x00]);
         cpu.x = 0x55;
         cpu.run();
@@ -1049,7 +1049,7 @@ mod tests {
 
     #[test]
     fn txs() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x9a, 0x00]);
         cpu.x = 0x55;
         cpu.run();
@@ -1058,7 +1058,7 @@ mod tests {
 
     #[test]
     fn tya() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x98, 0x00]);
         cpu.y = 0x55;
         cpu.run();
@@ -1071,7 +1071,7 @@ mod tests {
 
         #[test]
         fn immediate_no_carry_flag() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x69, 0x11, 0x00]);
             cpu.a = 0x22;
             cpu.run();
@@ -1080,7 +1080,7 @@ mod tests {
 
         #[test]
         fn immediate_with_carry_flag() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x69, 0x11, 0x00]);
             cpu.a = 0x22;
             cpu.set_flag(&Flag::Carry, true);
@@ -1090,7 +1090,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset(vec![0x65, 0x10, 0x00]);
             cpu.a = 0x22;
@@ -1100,7 +1100,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x33);
             cpu.load_reset(vec![0x75, 0x10, 0x00]);
             cpu.reset();
@@ -1112,7 +1112,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0x6d, 0x22, 0x11, 0x00]);
             cpu.a = 0x22;
@@ -1122,7 +1122,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x44);
             cpu.load_reset(vec![0x7d, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1134,7 +1134,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x44);
             cpu.load_reset(vec![0x79, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1146,7 +1146,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0x44);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -1160,7 +1160,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0x44);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -1179,7 +1179,7 @@ mod tests {
 
         #[test]
         fn immediate_no_carry_flag() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xe9, 0x11, 0x00]);
             cpu.a = 0x33;
             cpu.run();
@@ -1189,7 +1189,7 @@ mod tests {
 
         #[test]
         fn immediate_with_carry_flag() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xe9, 0x11, 0x00]);
             cpu.a = 0x33;
             cpu.set_flag(&Flag::Carry, true);
@@ -1200,7 +1200,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset(vec![0xe5, 0x10, 0x00]);
             cpu.a = 0x33;
@@ -1210,7 +1210,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x11);
             cpu.load_reset(vec![0xf5, 0x10, 0x00]);
             cpu.reset();
@@ -1222,7 +1222,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xed, 0x22, 0x11, 0x00]);
             cpu.a = 0x33;
@@ -1232,7 +1232,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xfd, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1244,7 +1244,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xf9, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1256,7 +1256,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0x11);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -1270,7 +1270,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0x11);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -1289,7 +1289,7 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x29, 0b0101, 0x00]);
             cpu.a = 0b1100;
             cpu.run();
@@ -1298,7 +1298,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b0101);
             cpu.load_reset(vec![0x25, 0x10, 0x00]);
             cpu.a = 0b1100;
@@ -1308,7 +1308,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x35, 0x10, 0x00]);
             cpu.reset();
@@ -1320,7 +1320,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b0101);
             cpu.load_reset(vec![0x2d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -1330,7 +1330,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x3d, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1342,7 +1342,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x39, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1354,7 +1354,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0b0101);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -1368,7 +1368,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0b0101);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -1387,7 +1387,7 @@ mod tests {
 
         #[test]
         fn accumulator_no_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x0a, 0x00]);
             cpu.a = 0b0101;
             cpu.run();
@@ -1397,7 +1397,7 @@ mod tests {
 
         #[test]
         fn accumulator_with_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x0a, 0x00]);
             cpu.a = 0b1010_1010;
             cpu.run();
@@ -1407,7 +1407,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b0101);
             cpu.load_reset(vec![0x06, 0x10, 0x00]);
             cpu.a = 0b1010;
@@ -1417,7 +1417,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x16, 0x10, 0x00]);
             cpu.reset();
@@ -1428,7 +1428,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b0101);
             cpu.load_reset(vec![0x0e, 0x22, 0x11, 0x00]);
             cpu.run();
@@ -1437,7 +1437,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x1e, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1453,7 +1453,7 @@ mod tests {
 
         #[test]
         fn accumulator_no_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x4a, 0x00]);
             cpu.a = 0b1010_1010;
             cpu.run();
@@ -1463,7 +1463,7 @@ mod tests {
 
         #[test]
         fn accumulator_with_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x4a, 0x00]);
             cpu.a = 0b0101_0101;
             cpu.run();
@@ -1473,7 +1473,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b1010);
             cpu.load_reset(vec![0x46, 0x10, 0x00]);
             cpu.run();
@@ -1482,7 +1482,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b1010);
             cpu.load_reset(vec![0x56, 0x10, 0x00]);
             cpu.reset();
@@ -1493,7 +1493,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b1010);
             cpu.load_reset(vec![0x4e, 0x22, 0x11, 0x00]);
             cpu.run();
@@ -1502,7 +1502,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b1010);
             cpu.load_reset(vec![0x5e, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1518,7 +1518,7 @@ mod tests {
 
         #[test]
         fn accumulator_has_no_carry_set_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x2a, 0x00]);
             cpu.a = 0b1010_1010;
             cpu.run();
@@ -1528,7 +1528,7 @@ mod tests {
 
         #[test]
         fn accumulator_has_carry_unset_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x2a, 0x00]);
             cpu.a = 0b0010_1010;
             cpu.set_flag(&Flag::Carry, true);
@@ -1539,7 +1539,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b0101);
             cpu.load_reset(vec![0x26, 0x10, 0x00]);
             cpu.run();
@@ -1548,7 +1548,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x36, 0x10, 0x00]);
             cpu.reset();
@@ -1559,7 +1559,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b0101);
             cpu.load_reset(vec![0x2e, 0x22, 0x11, 0x00]);
             cpu.run();
@@ -1568,7 +1568,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x3e, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1584,7 +1584,7 @@ mod tests {
 
         #[test]
         fn accumulator_has_no_carry_set_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x6a, 0x00]);
             cpu.a = 0b0101_0101;
             cpu.run();
@@ -1594,7 +1594,7 @@ mod tests {
 
         #[test]
         fn accumulator_has_carry_unset_carry() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x6a, 0x00]);
             cpu.a = 0b0101_0100;
             cpu.set_flag(&Flag::Carry, true);
@@ -1605,7 +1605,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b1010);
             cpu.load_reset(vec![0x66, 0x10, 0x00]);
             cpu.run();
@@ -1614,7 +1614,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b1010);
             cpu.load_reset(vec![0x76, 0x10, 0x00]);
             cpu.reset();
@@ -1625,7 +1625,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b1010);
             cpu.load_reset(vec![0x6e, 0x22, 0x11, 0x00]);
             cpu.run();
@@ -1634,7 +1634,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b1010);
             cpu.load_reset(vec![0x7e, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1650,7 +1650,7 @@ mod tests {
 
         #[test]
         fn zeropage_zero() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b_0000_0101);
             cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_1010;
@@ -1662,7 +1662,7 @@ mod tests {
 
         #[test]
         fn zeropage_overflow() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b_0100_0101);
             cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_0101;
@@ -1674,7 +1674,7 @@ mod tests {
 
         #[test]
         fn zeropage_negative() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b_1000_0101);
             cpu.load_reset(vec![0x24, 0x10, 0x00]);
             cpu.a = 0b0000_0101;
@@ -1686,7 +1686,7 @@ mod tests {
 
         #[test]
         fn absolute_zero() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b_0000_0101);
             cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
             cpu.a = 0b0000_1010;
@@ -1698,7 +1698,7 @@ mod tests {
 
         #[test]
         fn absolute_overflow() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b_0100_0101);
             cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
             cpu.a = 0b0000_0101;
@@ -1710,7 +1710,7 @@ mod tests {
 
         #[test]
         fn absolute_negative() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b_1000_0101);
             cpu.load_reset(vec![0x2c, 0x22, 0x11, 0x00]);
             cpu.a = 0b0000_0101;
@@ -1727,7 +1727,7 @@ mod tests {
 
         #[test]
         fn immediate_greater_than_param() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xc9, 0x11, 0x00]);
             cpu.a = 0x22;
             cpu.run();
@@ -1738,7 +1738,7 @@ mod tests {
 
         #[test]
         fn immediate_equal_with_param() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xc9, 0x22, 0x00]);
             cpu.a = 0x22;
             cpu.run();
@@ -1749,7 +1749,7 @@ mod tests {
 
         #[test]
         fn immediate_less_than_param() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xc9, 0x33, 0x00]);
             cpu.a = 0x22;
             cpu.run();
@@ -1760,7 +1760,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset(vec![0xc5, 0x10, 0x00]);
             cpu.a = 0x22;
@@ -1770,7 +1770,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x11);
             cpu.load_reset(vec![0xd5, 0x10, 0x00]);
             cpu.a = 0x22;
@@ -1781,7 +1781,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xcd, 0x22, 0x11, 0x00]);
             cpu.a = 0x22;
@@ -1791,7 +1791,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xdd, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1803,7 +1803,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xd9, 0x22, 0x11, 0x00]);
             cpu.reset();
@@ -1815,7 +1815,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0x11);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -1829,7 +1829,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0x11);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -1848,7 +1848,7 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xe0, 0x11, 0x00]);
             cpu.x = 0x22;
             cpu.run();
@@ -1857,7 +1857,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset(vec![0xe4, 0x10, 0x00]);
             cpu.x = 0x22;
@@ -1867,7 +1867,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xec, 0x22, 0x11, 0x00]);
             cpu.x = 0x22;
@@ -1882,7 +1882,7 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0xc0, 0x11, 0x00]);
             cpu.y = 0x22;
             cpu.run();
@@ -1891,7 +1891,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset(vec![0xc4, 0x10, 0x00]);
             cpu.y = 0x22;
@@ -1901,7 +1901,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset(vec![0xcc, 0x22, 0x11, 0x00]);
             cpu.y = 0x22;
@@ -1916,7 +1916,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset_run(vec![0xc6, 0x10, 0x00]);
             assert_eq!(cpu.mem_read(0x10), 0x10);
@@ -1924,7 +1924,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x11);
             cpu.load_reset(vec![0xd6, 0x10, 0x00]);
             cpu.x = 0x01;
@@ -1934,7 +1934,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset_run(vec![0xce, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.mem_read(0x1122), 0x10);
@@ -1942,7 +1942,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xde, 0x22, 0x11, 0x00]);
             cpu.x = 0x11;
@@ -1957,7 +1957,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0x11);
             cpu.load_reset_run(vec![0xe6, 0x10, 0x00]);
             assert_eq!(cpu.mem_read(0x10), 0x12);
@@ -1965,7 +1965,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0x11);
             cpu.load_reset(vec![0xf6, 0x10, 0x00]);
             cpu.x = 0x01;
@@ -1975,7 +1975,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0x11);
             cpu.load_reset_run(vec![0xee, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.mem_read(0x1122), 0x12);
@@ -1983,7 +1983,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0x11);
             cpu.load_reset(vec![0xfe, 0x22, 0x11, 0x00]);
             cpu.x = 0x11;
@@ -1994,7 +1994,7 @@ mod tests {
 
     #[test]
     fn dex() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xca, 0x00]);
         cpu.x = 0x11;
         cpu.run();
@@ -2003,7 +2003,7 @@ mod tests {
 
     #[test]
     fn dey() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x88, 0x00]);
         cpu.y = 0x11;
         cpu.run();
@@ -2012,7 +2012,7 @@ mod tests {
 
     #[test]
     fn inx() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xe8, 0x00]);
         cpu.x = 0x11;
         cpu.run();
@@ -2021,7 +2021,7 @@ mod tests {
 
     #[test]
     fn iny() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xc8, 0x00]);
         cpu.y = 0x11;
         cpu.run();
@@ -2034,7 +2034,7 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x49, 0b0101, 0x00]);
             cpu.a = 0b1100;
             cpu.run();
@@ -2043,7 +2043,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b0101);
             cpu.load_reset(vec![0x45, 0x10, 0x00]);
             cpu.a = 0b1100;
@@ -2053,7 +2053,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x55, 0x10, 0x00]);
             cpu.a = 0b1100;
@@ -2064,7 +2064,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b0101);
             cpu.load_reset(vec![0x4d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2074,7 +2074,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x5d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2085,7 +2085,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x59, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2096,7 +2096,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0b0101);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -2109,7 +2109,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0b0101);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -2127,7 +2127,7 @@ mod tests {
 
         #[test]
         fn immediate() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x09, 0b0101, 0x00]);
             cpu.a = 0b1100;
             cpu.run();
@@ -2136,7 +2136,7 @@ mod tests {
 
         #[test]
         fn zeropage() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x10, 0b0101);
             cpu.load_reset(vec![0x05, 0x10, 0x00]);
             cpu.a = 0b1100;
@@ -2146,7 +2146,7 @@ mod tests {
 
         #[test]
         fn zeropage_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x11, 0b0101);
             cpu.load_reset(vec![0x15, 0x10, 0x00]);
             cpu.a = 0b1100;
@@ -2157,7 +2157,7 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1122, 0b0101);
             cpu.load_reset(vec![0x0d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2167,7 +2167,7 @@ mod tests {
 
         #[test]
         fn absolute_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x1d, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2178,7 +2178,7 @@ mod tests {
 
         #[test]
         fn absolute_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x1133, 0b0101);
             cpu.load_reset(vec![0x19, 0x22, 0x11, 0x00]);
             cpu.a = 0b1100;
@@ -2189,7 +2189,7 @@ mod tests {
 
         #[test]
         fn indirect_x() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0705, 0b0101);
             cpu.mem_write(0x01, 0x05);
             cpu.mem_write(0x02, 0x07);
@@ -2202,7 +2202,7 @@ mod tests {
 
         #[test]
         fn indirect_y() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write(0x0704, 0b0101);
             cpu.mem_write(0x01, 0x03);
             cpu.mem_write(0x02, 0x07);
@@ -2216,7 +2216,7 @@ mod tests {
 
     #[test]
     fn pha() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x48, 0x00]);
         cpu.a = 0xaa;
         cpu.run();
@@ -2226,7 +2226,7 @@ mod tests {
 
     #[test]
     fn php() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x08, 0x00]);
         cpu.status = 0xaa;
         cpu.run();
@@ -2238,7 +2238,7 @@ mod tests {
 
     #[test]
     fn pla() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.mem_write(0x01bb, 0xaa);
         cpu.load_reset(vec![0x68, 0x00]);
         cpu.sp = 0xba;
@@ -2249,7 +2249,7 @@ mod tests {
 
     #[test]
     fn plp() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.mem_write(0x01bb, 0b1101_1111);
         cpu.load_reset(vec![0x28, 0x00]);
         cpu.sp = 0xba;
@@ -2264,14 +2264,14 @@ mod tests {
 
         #[test]
         fn absolute() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset_run(vec![0x4c, 0x22, 0x11, 0x00]);
             assert_eq!(cpu.pc, 0x1123);
         }
 
         #[test]
         fn indirect() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.mem_write_u16(0x11, 0x3344);
             cpu.load_reset_run(vec![0x6c, 0x11, 0x00]);
             assert_eq!(cpu.pc, 0x3345);
@@ -2280,7 +2280,7 @@ mod tests {
 
     #[test]
     fn jsr() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset_run(vec![0x20, 0x22, 0x11, 0x00]);
         assert_eq!(cpu.pc, 0x1123);
         assert_eq!(cpu.mem_read_u16(0x01fd), PROGRAM_BEGIN + 0x0002);
@@ -2292,7 +2292,7 @@ mod tests {
 
         #[test]
         fn implied() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             cpu.load_reset(vec![0x60]);
             cpu.stack_push_u16(0x1122);
             cpu.run();
@@ -2302,7 +2302,7 @@ mod tests {
 
         #[test]
         fn implied_with_jsr() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // (PROGRAM_BEGIN=$8000)
             // JSR $1122 ; $8000
             // LDA #$AA  ; $8003
@@ -2321,7 +2321,7 @@ mod tests {
 
     #[test]
     fn rti() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x40]);
         cpu.stack_push_u16(0x1122);
         cpu.stack_push(0b1101_1111);
@@ -2336,7 +2336,7 @@ mod tests {
 
         #[test]
         fn immediate_forward() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             //   BCC label
             //   BRK
             // label:
@@ -2350,7 +2350,7 @@ mod tests {
 
         #[test]
         fn immediate_backward() {
-            let mut cpu = CPU::new_with_big_mem();
+            let mut cpu = CPU::new_with_big_ram();
             // (PROGRAM_BEGIN=$8000)
             //   JMP $8006 ; $8000
             // label:
@@ -2370,7 +2370,7 @@ mod tests {
 
     #[test]
     fn bcs() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BCS label
         //   BRK
         // label:
@@ -2384,7 +2384,7 @@ mod tests {
 
     #[test]
     fn beq() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BEQ label
         //   BRK
         // label:
@@ -2398,7 +2398,7 @@ mod tests {
 
     #[test]
     fn bmi() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BMI label
         //   BRK
         // label:
@@ -2412,7 +2412,7 @@ mod tests {
 
     #[test]
     fn bne() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BNE label
         //   BRK
         // label:
@@ -2426,7 +2426,7 @@ mod tests {
 
     #[test]
     fn bpl() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BPL label
         //   BRK
         // label:
@@ -2440,7 +2440,7 @@ mod tests {
 
     #[test]
     fn bvc() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BVC label
         //   BRK
         // label:
@@ -2454,7 +2454,7 @@ mod tests {
 
     #[test]
     fn bvs() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         //   BVS label
         //   BRK
         // label:
@@ -2468,7 +2468,7 @@ mod tests {
 
     #[test]
     fn clc() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x18, 0x00]);
         cpu.set_flag(&Flag::Carry, true);
         cpu.run();
@@ -2477,7 +2477,7 @@ mod tests {
 
     #[test]
     fn cld() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xd8, 0x00]);
         cpu.set_flag(&Flag::Decimal, true);
         cpu.run();
@@ -2486,7 +2486,7 @@ mod tests {
 
     #[test]
     fn cli() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x58, 0x00]);
         cpu.set_flag(&Flag::IRQDisabled, true);
         cpu.run();
@@ -2495,7 +2495,7 @@ mod tests {
 
     #[test]
     fn clv() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xb8, 0x00]);
         cpu.set_flag(&Flag::OverFlow, true);
         cpu.run();
@@ -2504,7 +2504,7 @@ mod tests {
 
     #[test]
     fn sec() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x38, 0x00]);
         cpu.set_flag(&Flag::Carry, false);
         cpu.run();
@@ -2513,7 +2513,7 @@ mod tests {
 
     #[test]
     fn sed() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0xf8, 0x00]);
         cpu.set_flag(&Flag::Decimal, false);
         cpu.run();
@@ -2522,7 +2522,7 @@ mod tests {
 
     #[test]
     fn sei() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset(vec![0x78, 0x00]);
         cpu.set_flag(&Flag::IRQDisabled, false);
         cpu.run();
@@ -2531,13 +2531,13 @@ mod tests {
 
     #[test]
     fn brk() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset_run(vec![0x00]);
     }
 
     #[test]
     fn nop() {
-        let mut cpu = CPU::new_with_big_mem();
+        let mut cpu = CPU::new_with_big_ram();
         cpu.load_reset_run(vec![0xea, 0x00]);
     }
 }
