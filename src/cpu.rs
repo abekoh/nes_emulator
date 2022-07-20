@@ -6,6 +6,7 @@ use crate::bus::Bus;
 use crate::mem::Mem;
 use crate::opcodes;
 use crate::opcodes::Mnemonic;
+use crate::rom::Rom;
 
 const PROGRAM_BEGIN: u16 = 0x0600;
 const STACK_BEGIN: u16 = 0x0100;
@@ -139,7 +140,7 @@ impl Mem for CPU {
 }
 
 impl CPU {
-    pub fn new() -> Self {
+    pub fn new(rom: Rom) -> Self {
         CPU {
             a: 0,
             x: 0,
@@ -147,7 +148,7 @@ impl CPU {
             sp: SP_BEGIN,
             status: 0,
             pc: 0,
-            ram: Box::new(Bus::new()),
+            ram: Box::new(Bus::new(rom)),
             jumped: false,
         }
     }
