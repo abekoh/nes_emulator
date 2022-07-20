@@ -49,7 +49,7 @@ impl Mem for Bus {
                 self.read_prg_rom(addr)
             }
             _ => {
-                debug!("Ignoreing mem access at {}", addr);
+                debug!("Ignoring mem access at {}", addr);
                 0
             }
         }
@@ -68,7 +68,7 @@ impl Mem for Bus {
                 debug!("Attempt to write to Cartridge ROM space")
             }
             _ => {
-                debug!("Ignoreing mem write-access at {}", addr);
+                debug!("Ignoring mem write-access at {}", addr);
             }
         }
     }
