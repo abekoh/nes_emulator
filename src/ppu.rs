@@ -40,17 +40,20 @@ impl PPU {
         self.increment_vram_addr();
 
         match addr {
+            // CHR_ROM
             0x0000..=0x1fff => {
                 let result = self.internal_data_buf;
                 self.internal_data_buf = self.chr_rom[addr as usize];
                 result
             }
+            // VRAM
             0x2000..=0x2fff => {
                 let result = self.internal_data_buf;
                 self.internal_data_buf = self.vram[self.mirror_vram_addr(addr) as usize];
                 result
             }
             0x3000..=0x3eff => panic!("addr space 0x3000..0x3eff is not expected to be used, requested = {}", addr),
+            // Palettes
             0x3f00..=0x3fff => {
                 self.palette_table[(addr - 0x3f00) as usize]
             }
