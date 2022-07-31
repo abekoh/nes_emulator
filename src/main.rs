@@ -15,6 +15,7 @@ pub mod cpu;
 pub mod opcodes;
 pub mod mem;
 mod rom;
+mod ppu;
 
 fn main() {
     env_logger::init();
