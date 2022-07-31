@@ -25,7 +25,7 @@ const PALETTE_BEGIN: u16 = 0x3f00;
 const PALETTE_END: u16 = 0x3fff;
 
 impl PPU {
-    fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
+    pub fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
         PPU {
             chr_rom,
             mirroring,

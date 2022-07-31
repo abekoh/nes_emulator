@@ -1,11 +1,13 @@
 use log::debug;
 
 use crate::Mem;
+use crate::ppu::PPU;
 use crate::rom::Rom;
 
 pub struct Bus {
     cpu_vram: [u8; 2048],
     prg_rom: Vec<u8>,
+    ppu: PPU,
 }
 
 const RAM: u16 = 0x0000;
@@ -23,9 +25,11 @@ const ROM_END: u16 = 0xffff;
 
 impl Bus {
     pub fn new(rom: Rom) -> Self {
+        let ppu = PPU::new(rom.chr_rom, rom.screen_mirrorling);
         Bus {
             cpu_vram: [0; 2048],
             prg_rom: rom.prg_rom,
+            ppu,
         }
     }
     fn read_prg_rom(&self, mut addr: u16) -> u8 {
