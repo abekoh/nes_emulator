@@ -61,6 +61,7 @@ impl PPU {
             }
             UNUSED_BEGIN..=UNUSED_END => panic!("addr space 0x3000..0x3eff is not expected to be used, requested = {}", addr),
             PALETTE_BEGIN..=PALETTE_END => {
+                // The palette data is placed immediately on the data bus, and hence no dummy read is required.
                 self.palette_table[(addr - 0x3f00) as usize]
             }
             _ => panic!("unexpected access to mirrored space {}", addr),
