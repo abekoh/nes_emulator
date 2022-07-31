@@ -13,6 +13,15 @@ pub struct PPU {
     internal_data_buf: u8,
 }
 
+const CHR_ROM_BEGIN: u16 = 0x0000;
+const CHR_ROM_END: u16 = 0x1fff;
+const VRAM_BEGIN: u16 = 0x2000;
+const VRAM_END: u16 = 0x2fff;
+const UNUSED_BEGIN: u16 = 0x3000;
+const UNUSED_END: u16 = 0x3eff;
+const PALETTE_BEGIN: u16 = 0x3f00;
+const PALETTE_END: u16 = 0x3fff;
+
 impl PPU {
     fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
         PPU {
@@ -40,21 +49,18 @@ impl PPU {
         self.increment_vram_addr();
 
         match addr {
-            // CHR_ROM
-            0x0000..=0x1fff => {
+            CHR_ROM_BEGIN..=CHR_ROM_END => {
                 let result = self.internal_data_buf;
                 self.internal_data_buf = self.chr_rom[addr as usize];
                 result
             }
-            // VRAM
-            0x2000..=0x2fff => {
+            VRAM_BEGIN..=VRAM_END => {
                 let result = self.internal_data_buf;
                 self.internal_data_buf = self.vram[self.mirror_vram_addr(addr) as usize];
                 result
             }
-            0x3000..=0x3eff => panic!("addr space 0x3000..0x3eff is not expected to be used, requested = {}", addr),
-            // Palettes
-            0x3f00..=0x3fff => {
+            UNUSED_BEGIN..=UNUSED_END => panic!("addr space 0x3000..0x3eff is not expected to be used, requested = {}", addr),
+            PALETTE_BEGIN..=PALETTE_END => {
                 self.palette_table[(addr - 0x3f00) as usize]
             }
             _ => panic!("unexpected access to mirrored space {}", addr),
