@@ -72,9 +72,18 @@ impl Mem for Bus {
                 let mirror_down_addr = addr & RAM_BUS_PINS;
                 self.cpu_vram[mirror_down_addr as usize] = data;
             }
-            PPU_REGISTERS..=PPU_REGISTERS_MIRRORS_END => {
-                let _mirror_down_addr = addr & RAM_BUS_PINS;
-                todo!("PPU is not supported yet")
+            0x2000 => {
+                self.ppu.write_to_ctrl(data);
+            }
+            0x2006 => {
+                self.ppu.write_to_ppu_addr(data);
+            }
+            0x2007 => {
+                self.ppu.write_to_data(data);
+            }
+            0x2008..=PPU_REGISTERS_MIRRORS_END => {
+                let mirror_down_addr = addr & RAM_BUS_PINS;
+                self.mem_write(mirror_down_addr, data);
             }
             ROM..=ROM_END => {
                 debug!("Attempt to write to Cartridge ROM space")
