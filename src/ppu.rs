@@ -8,3 +8,15 @@ pub struct PPU {
 
     mirroring: Mirroring,
 }
+
+impl PPU {
+    fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
+        PPU {
+            chr_rom,
+            mirroring,
+            vram: [0; 2048],
+            oam_data: [0; 64 * 4],
+            palette_table: [0; 32],
+        }
+    }
+}
