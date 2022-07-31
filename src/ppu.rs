@@ -1,3 +1,6 @@
+use std::fs::metadata;
+use std::intrinsics::unreachable;
+
 use bitflags::bitflags;
 
 use crate::rom::Mirroring;
@@ -67,8 +70,32 @@ impl PPU {
             _ => panic!("unexpected access to mirrored space {}", addr),
         }
     }
+
+    // VRAM:
+    //   A : 0x0000 .. 0x0400
+    //   B : 0x0400 .. 0x0800
+    // PPU Memory Map (Horizontal):
+    //   [ a1 : 0x2000 ] [ a2 : 0x2400 ]
+    //   [ b1 : 0x2800 ] [ b2 : 0x2c00 ]
+    // PPU Memory Map (Vertical):
+    //   [ a1 : 0x2000 ] [ b1 : 0x2400 ]
+    //   [ a2 : 0x2800 ] [ b2 : 0x2c00 ]
     fn mirror_vram_addr(&self, addr: u16) -> u16 {
-        todo!()
+        const SPACE_SIZE: u16 = 0x0400;
+        let mirrored_vram = addr & 0b0010_1111_1111_1111;
+        let vram_index = mirrored_vram - VRAM_BEGIN;
+        let name_table = vram_index / SPACE_SIZE;
+        match (&self.mirroring, name_table) {
+            (Mirroring::HORIZONTAL, 0) => vram_index,                  // a1 -> A
+            (Mirroring::HORIZONTAL, 1) => vram_index - SPACE_SIZE,     // a2 -> A
+            (Mirroring::HORIZONTAL, 2) => vram_index - SPACE_SIZE,     // b1 -> B
+            (Mirroring::HORIZONTAL, 3) => vram_index - SPACE_SIZE * 2, // b2 -> B
+            (Mirroring::VERTICAL, 0) => vram_index,                    // a1 -> A
+            (Mirroring::VERTICAL, 1) => vram_index,                    // b1 -> B
+            (Mirroring::VERTICAL, 2) => vram_index - SPACE_SIZE * 2,   // a2 -> A
+            (Mirroring::VERTICAL, 3) => vram_index - SPACE_SIZE * 2,   // b2 -> B
+            _ => unreachable!()
+        }
     }
 }
 
