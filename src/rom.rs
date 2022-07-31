@@ -78,4 +78,14 @@ pub mod test {
         assert_eq!(rom.mapper, 0b0000_0000);
         assert_eq!(rom.screen_mirrorling, Mirroring::HORIZONTAL);
     }
+
+    #[test]
+    fn load_hello_world() {
+        let raw_rom = load_row_as_raw(HELLO_WORLD_PATH);
+        let rom = Rom::new(&raw_rom).expect("failed to load rom");
+        assert_eq!(rom.prg_rom.len(), 0x02 * 16384);
+        assert_eq!(rom.chr_rom.len(), 0x01 * 8192);
+        assert_eq!(rom.mapper, 0b0000_0000);
+        assert_eq!(rom.screen_mirrorling, Mirroring::VERTICAL);
+    }
 }
