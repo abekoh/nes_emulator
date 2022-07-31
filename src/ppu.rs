@@ -9,6 +9,7 @@ pub struct PPU {
     oam_data: [u8; 256],
     mirroring: Mirroring,
     addr: AddrRegister,
+    ctrl: ControlRegister,
 }
 
 impl PPU {
@@ -24,6 +25,9 @@ impl PPU {
     }
     fn write_to_ppu_addr(&mut self, value: u8) {
         self.addr.update(value);
+    }
+    fn write_to_ctrl(&mut self, value: u8) {
+        self.ctrl.update(value);
     }
 }
 
@@ -89,4 +93,22 @@ bitflags! {
         const GENERATE_NMI            = 0b1000_0000;
     }
 
+}
+
+impl ControlRegister {
+    pub fn new() -> Self {
+        ControlRegister::from_bits_truncate(0b0000_0000)
+    }
+
+    pub fn vram_addr_increment(&self) -> u8 {
+        if !self.contains(ControlRegister::VRAM_ADD_INCREMENT) {
+            0b0000_0001
+        } else {
+            0b0010_0000
+        }
+    }
+
+    pub fn update(&mut self, data: u8) {
+        self.bits = data;
+    }
 }
