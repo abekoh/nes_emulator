@@ -37,7 +37,7 @@ impl PPU {
             internal_data_buf: 0,
         }
     }
-    fn write_to_ppu_addr(&mut self, value: u8) {
+    pub fn write_to_ppu_addr(&mut self, value: u8) {
         self.addr.update(value);
     }
     fn write_to_ctrl(&mut self, value: u8) {
@@ -46,7 +46,7 @@ impl PPU {
     fn increment_vram_addr(&mut self) {
         self.addr.increment(self.ctrl.vram_addr_increment());
     }
-    fn read_data(&mut self) -> u8 {
+    pub fn read_data(&mut self) -> u8 {
         let addr = self.addr.get();
         self.increment_vram_addr();
 

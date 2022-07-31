@@ -43,15 +43,19 @@ impl Bus {
 
 
 impl Mem for Bus {
-    fn mem_read(&self, addr: u16) -> u8 {
+    fn mem_read(&mut self, addr: u16) -> u8 {
         match addr {
             RAM..=RAM_MIRRORS_END => {
                 let mirror_down_addr = addr & RAM_BUS_PINS;
                 self.cpu_vram[mirror_down_addr as usize]
             }
-            PPU_REGISTERS..=PPU_REGISTERS_MIRRORS_END => {
-                let _mirror_down_addr = addr & PPU_BUS_PINS;
-                todo!("PPU is not supported yet")
+            0x2000 | 0x2001 | 0x2003 | 0x2005 | 0x2006 | 0x4014 => {
+                panic!("Attempt to read from write-only PPU address {:x}", addr)
+            }
+            0x2007 => self.ppu.read_data(),
+            0x2008..=PPU_REGISTERS_MIRRORS_END => {
+                let mirror_down_addr = addr & PPU_BUS_PINS;
+                self.mem_read(mirror_down_addr)
             }
             ROM..=ROM_END => {
                 self.read_prg_rom(addr)
