@@ -61,17 +61,17 @@ pub mod test {
 
     use super::*;
 
-    const TEST_ROM_PATH: &str = "nestest.nes";
+    const NES_TEST_PATH: &str = "sample_rom/nestest.nes";
 
-    fn load_nestest_rom() -> Vec<u8> {
-        let rom_bin = fs::read(TEST_ROM_PATH).expect(&format!("failed to load {}", TEST_ROM_PATH));
+    fn load_row_as_raw(path: &str) -> Vec<u8> {
+        let rom_bin = fs::read(path).expect(&format!("failed to load {}", path));
         rom_bin
     }
 
     #[test]
     fn success_loading() {
-        let rom_bin = load_nestest_rom();
-        let rom = Rom::new(&rom_bin).expect("failed to load rom");
+        let raw_rom = load_row_as_raw(NES_TEST_PATH);
+        let rom = Rom::new(&raw_rom).expect("failed to load rom");
         assert_eq!(rom.prg_rom.len(), 0x01 * 16384);
         assert_eq!(rom.chr_rom.len(), 0x01 * 8192);
         assert_eq!(rom.mapper, 0b0000_0000);
