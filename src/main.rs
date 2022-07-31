@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
+extern crate core;
 
 use rand::Rng;
 use sdl2::event::Event;

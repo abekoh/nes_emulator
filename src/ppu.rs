@@ -10,6 +10,7 @@ pub struct PPU {
     mirroring: Mirroring,
     addr: AddrRegister,
     ctrl: ControlRegister,
+    internal_data_buf: u8,
 }
 
 impl PPU {
@@ -21,6 +22,8 @@ impl PPU {
             oam_data: [0; 64 * 4],
             palette_table: [0; 32],
             addr: AddrRegister::new(),
+            ctrl: ControlRegister::new(),
+            internal_data_buf: 0,
         }
     }
     fn write_to_ppu_addr(&mut self, value: u8) {
@@ -28,6 +31,34 @@ impl PPU {
     }
     fn write_to_ctrl(&mut self, value: u8) {
         self.ctrl.update(value);
+    }
+    fn increment_vram_addr(&mut self) {
+        self.addr.increment(self.ctrl.vram_addr_increment());
+    }
+    fn read_data(&mut self) -> u8 {
+        let addr = self.addr.get();
+        self.increment_vram_addr();
+
+        match addr {
+            0x0000..=0x1fff => {
+                let result = self.internal_data_buf;
+                self.internal_data_buf = self.chr_rom[addr as usize];
+                result
+            }
+            0x2000..=0x2fff => {
+                let result = self.internal_data_buf;
+                self.internal_data_buf = self.vram[self.mirror_vram_addr(addr) as usize];
+                result
+            }
+            0x3000..=0x3eff => panic!("addr space 0x3000..0x3eff is not expected to be used, requested = {}", addr),
+            0x3f00..=0x3fff => {
+                self.palette_table[(addr - 0x3f00) as usize]
+            }
+            _ => panic!("unexpected access to mirrored space {}", addr),
+        }
+    }
+    fn mirror_vram_addr(&self, addr: u16) -> u16 {
+        todo!()
     }
 }
 
