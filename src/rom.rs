@@ -72,6 +72,9 @@ pub mod test {
     fn success_loading() {
         let rom_bin = load_nestest_rom();
         let rom = Rom::new(&rom_bin).expect("failed to load rom");
-        println!("{:?}", rom);
+        assert_eq!(rom.prg_rom.len(), 0x01 * 16384);
+        assert_eq!(rom.chr_rom.len(), 0x01 * 8192);
+        assert_eq!(rom.mapper, 0b0000_0000);
+        assert_eq!(rom.screen_mirrorling, Mirroring::HORIZONTAL);
     }
 }
