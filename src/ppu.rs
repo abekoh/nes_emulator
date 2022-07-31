@@ -63,45 +63,49 @@ impl PPU {
 }
 
 pub struct AddrRegister {
-    value: (u8, u8),
+    hi: u8,
+    lo: u8,
     hi_ptr: bool,
 }
 
 impl AddrRegister {
     pub fn new() -> Self {
         Self {
-            value: (0, 0),
+            hi: 0,
+            lo: 0,
             hi_ptr: true,
         }
     }
+
     fn set(&mut self, data: u16) {
-        self.value.0 = (data >> 8) as u8;
-        self.value.1 = (data & 0xff) as u8;
+        self.hi = (data >> 8) as u8;
+        self.lo = (data & 0xff) as u8;
     }
 
     fn get(&self) -> u16 {
-        ((self.value.0 as u16) << 8) | (self.value.1 as u16)
+        ((self.hi as u16) << 8) | (self.lo as u16)
     }
 
     fn update(&mut self, data: u8) {
         if self.hi_ptr {
-            self.value.0 = data;
+            self.hi = data;
         } else {
-            self.value.1 = data;
+            self.lo = data;
         }
-
-        if self.get() > 0x3fff {
-            self.set(self.get() & 0b0011_1111_1111_1111);
-        }
+        self.mirror_down();
         self.hi_ptr = !self.hi_ptr;
     }
 
     fn increment(&mut self, inc: u8) {
-        let lo = self.value.1;
-        self.value.1 = self.value.1.wrapping_add(inc);
-        if lo > self.value.1 {
-            self.value.0 = self.value.0.wrapping_add(1);
+        let (new_lo, over) = self.lo.overflowing_add(inc);
+        self.lo = new_lo;
+        if over {
+            self.hi = self.hi.wrapping_add(1);
         }
+        self.mirror_down();
+    }
+
+    fn mirror_down(&mut self) {
         if self.get() > 0x3fff {
             self.set(self.get() & 0b0011_1111_1111_1111);
         }
