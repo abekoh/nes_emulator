@@ -5,8 +5,8 @@ pub struct PPU {
     palette_table: [u8; 32],
     vram: [u8; 2048],
     oam_data: [u8; 256],
-
     mirroring: Mirroring,
+    addr: AddrRegister,
 }
 
 impl PPU {
@@ -17,7 +17,11 @@ impl PPU {
             vram: [0; 2048],
             oam_data: [0; 64 * 4],
             palette_table: [0; 32],
+            addr: AddrRegister::new(),
         }
+    }
+    fn write_to_ppu_addr(&mut self, value: u8) {
+        self.addr.update(value);
     }
 }
 
@@ -37,8 +41,9 @@ impl AddrRegister {
         self.value.0 = (data >> 8) as u8;
         self.value.1 = (data & 0xff) as u8;
     }
+
     fn get(&self) -> u16 {
-        ((self.value.0 as u16) << 8) | self.value.1 as u16)
+        ((self.value.0 as u16) << 8) | (self.value.1 as u16)
     }
 
     fn update(&mut self, data: u8) {
