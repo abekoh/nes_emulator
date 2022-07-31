@@ -1,3 +1,5 @@
+use bitflags::bitflags;
+
 use crate::rom::Mirroring;
 
 pub struct PPU {
@@ -73,4 +75,18 @@ impl AddrRegister {
     fn reset_latch(&mut self) {
         self.hi_ptr = true;
     }
+}
+
+bitflags! {
+    pub struct ControlRegister: u8 {
+        const NAMETABLE1              = 0b0000_0001;
+        const NAMETABLE2              = 0b0000_0010;
+        const VRAM_ADD_INCREMENT      = 0b0000_0100;
+        const SPRITE_PATTERN_ADDR     = 0b0000_1000;
+        const BACKGROUND_PATTERN_ADDR = 0b0001_0000;
+        const SPRITE_SIZE             = 0b0010_0000;
+        const MASTER_SLAVE_SECLET     = 0b0100_0000;
+        const GENERATE_NMI            = 0b1000_0000;
+    }
+
 }
