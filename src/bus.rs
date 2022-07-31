@@ -17,6 +17,10 @@ const PPU_BUS_PINS: u16 = 0b0010_0000_0000_0111;
 const ROM: u16 = 0x8000;
 const ROM_END: u16 = 0xffff;
 
+/// 0x0000 - 0x1fff : CPU RAM
+/// 0x2000 - 0x3fff : PPU Registers
+/// 0x8000 - 0xffff : PRG ROM
+
 impl Bus {
     pub fn new(rom: Rom) -> Self {
         Bus {
