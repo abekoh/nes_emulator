@@ -19,7 +19,6 @@ const ROM_END: u16 = 0xffff;
 
 /// - 0x0000 .. 0x1fff : CPU RAM
 /// - 0x2000 .. 0x3fff : PPU Registers
-///   - 0x
 /// - 0x8000 .. 0xffff : PRG ROM
 
 impl Bus {
