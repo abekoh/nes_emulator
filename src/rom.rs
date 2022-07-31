@@ -10,6 +10,7 @@ pub enum Mirroring {
     FOUR_SCREEN,
 }
 
+#[derive(Debug)]
 pub struct Rom {
     pub prg_rom: Vec<u8>,
     pub chr_rom: Vec<u8>,
@@ -52,5 +53,25 @@ impl Rom {
             mapper,
             screen_mirrorling: screen_mirroring,
         })
+    }
+}
+
+pub mod test {
+    use std::fs;
+
+    use super::*;
+
+    const TEST_ROM_PATH: &str = "nestest.nes";
+
+    fn load_nestest_rom() -> Vec<u8> {
+        let rom_bin = fs::read(TEST_ROM_PATH).expect(&format!("failed to load {}", TEST_ROM_PATH));
+        rom_bin
+    }
+
+    #[test]
+    fn success_loading() {
+        let rom_bin = load_nestest_rom();
+        let rom = Rom::new(&rom_bin).expect("failed to load rom");
+        println!("{:?}", rom);
     }
 }
