@@ -1,5 +1,4 @@
 use std::fs::metadata;
-use std::intrinsics::unreachable;
 
 use bitflags::bitflags;
 
